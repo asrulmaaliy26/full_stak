@@ -1,10 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
-Route::get('/', function () {
-    return view('welcome');
-});
 use App\Http\Controllers\Api\{
     HomeController,
     NewsController,
@@ -16,6 +12,12 @@ use App\Http\Controllers\Api\{
     ConfigJenjangController
 };
 
+// Serve React App for the root URL
+Route::get('/', function () {
+    return view('react_app');
+});
+
+// API Routes (kept as is for now, though ideally should be in api.php)
 Route::get('/home', [HomeController::class, 'index']);
 
 Route::get('/news', [NewsController::class, 'index']);
@@ -40,3 +42,9 @@ Route::get('/about/{jenjang}', [AboutController::class, 'show']);
 Route::get('/categories', [CategoryController::class, 'index']);
 
 Route::get('/jenjang', [ConfigJenjangController::class, 'levels']);
+
+// Fallback route for React Router (SPA)
+// Any route not matched above will be handled by the React App
+Route::fallback(function () {
+    return view('react_app');
+});
