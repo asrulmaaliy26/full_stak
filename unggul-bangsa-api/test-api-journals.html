@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API POST Journals - Unggul Bangsa</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        label .required {
+            color: #e74c3c;
+        }
+
+        label .badge {
+            display: inline-block;
+            background: #4facfe;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            margin-left: 5px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .file-info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(79, 172, 254, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .response {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .response.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .response.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .response h3 {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .response pre {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4facfe;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 5px;
+        }
+
+        .info-box h4 {
+            color: #1976d2;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .info-box ul {
+            margin-left: 20px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .info-box ul li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Test API POST Journals</h1>
+            <p>Form untuk testing endpoint POST /api/journals</p>
+        </div>
+
+        <div class="form-container">
+            <div class="info-box">
+                <h4>ℹ️ Informasi Jurnal</h4>
+                <ul>
+                    <li><strong>Score:</strong> Nilai antara 0-100</li>
+                    <li><strong>Is Best:</strong> Centang jika jurnal ini adalah jurnal terbaik</li>
+                    <li><strong>Jenjang:</strong> Tingkat pendidikan (TK/MI/SMP/MA/STAI)</li>
+                </ul>
+            </div>
+
+            <form id="journalForm">
+                <div class="form-group">
+                    <label for="title">Judul Jurnal <span class="required">*</span></label>
+                    <input type="text" id="title" name="title" required placeholder="Contoh: Zakat & Ekonomi Digital">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="category">Kategori <span class="required">*</span></label>
+                        <select id="category" name="category" required>
+                            <option value="">-- Pilih Kategori --</option>
+                            <option value="Ekonomi Syariah">Ekonomi Syariah</option>
+                            <option value="Pendidikan">Pendidikan</option>
+                            <option value="Teknologi">Teknologi</option>
+                            <option value="Sosial">Sosial</option>
+                            <option value="Kesehatan">Kesehatan</option>
+                            <option value="Sains">Sains</option>
+                            <option value="Lainnya">Lainnya</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="jenjang">Jenjang <span class="required">*</span></label>
+                        <select id="jenjang" name="jenjang" required>
+                            <option value="">-- Pilih Jenjang --</option>
+                            <option value="TK">TK</option>
+                            <option value="MI">MI</option>
+                            <option value="SMPT">SMPT</option>
+                            <option value="MA">MA</option>
+                            <option value="KAMPUS">KAMPUS</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="abstract">Abstrak <span class="required">*</span></label>
+                    <textarea id="abstract" name="abstract" required
+                        placeholder="Ringkasan atau abstrak jurnal..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="author">Penulis/Mahasiswa <span class="required">*</span></label>
+                        <input type="text" id="author" name="author" required placeholder="Contoh: Ahmad Mahasiswa">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mentor">Pembimbing/Mentor <span class="required">*</span></label>
+                        <input type="text" id="mentor" name="mentor" required placeholder="Contoh: Dr. Zainal">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="score">Nilai <span class="required">*</span> <span
+                                class="badge">0-100</span></label>
+                        <input type="number" id="score" name="score" required min="0" max="100" placeholder="98">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="date">Tanggal <span class="required">*</span></label>
+                        <input type="date" id="date" name="date" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="is_best" name="is_best" value="1">
+                        <label for="is_best" style="margin-bottom: 0;">
+                            🏆 Tandai sebagai Jurnal Terbaik
+                        </label>
+                    </div>
+                    <div class="file-info">Centang jika jurnal ini mendapat penghargaan atau nilai terbaik</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="documentUrl">Dokumen PDF (Opsional)</label>
+                    <input type="file" id="documentUrl" name="documentUrl" accept=".pdf"
+                        style="width: 100%; padding: 10px; border: 2px dashed #e0e0e0; border-radius: 8px; cursor: pointer;">
+                    <div class="file-info">Format: PDF (Max: 10MB)</div>
+                    <div id="pdfInfo" style="margin-top: 10px; font-size: 13px; color: #555;"></div>
+                </div>
+
+                <button type="submit" class="btn" id="submitBtn">
+                    📤 Kirim Jurnal
+                </button>
+            </form>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Mengirim data...</p>
+            </div>
+
+            <div class="response" id="response"></div>
+        </div>
+    </div>
+
+    <script>
+        // Set default date to today
+        document.getElementById('date').valueAsDate = new Date();
+
+        // PDF file preview
+        document.getElementById('documentUrl').addEventListener('change', function (e) {
+            const pdfInfo = document.getElementById('pdfInfo');
+            pdfInfo.innerHTML = '';
+
+            if (e.target.files.length > 0) {
+                const file = e.target.files[0];
+                const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+
+                if (fileSizeMB > 10) {
+                    pdfInfo.innerHTML = '<span style="color: #e74c3c;">⚠️ File terlalu besar! Maksimal 10MB</span>';
+                    e.target.value = '';
+                } else {
+                    pdfInfo.innerHTML = `📄 ${file.name} (${fileSizeMB} MB)`;
+                }
+            }
+        });
+
+        // Handle form submission
+        document.getElementById('journalForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const form = e.target;
+            const formData = new FormData();
+
+            // Add all fields
+            formData.append('title', document.getElementById('title').value);
+            formData.append('category', document.getElementById('category').value);
+            formData.append('abstract', document.getElementById('abstract').value);
+            formData.append('author', document.getElementById('author').value);
+            formData.append('mentor', document.getElementById('mentor').value);
+            formData.append('score', document.getElementById('score').value);
+            formData.append('date', document.getElementById('date').value);
+            formData.append('jenjang', document.getElementById('jenjang').value);
+
+            // Add is_best (convert checkbox to boolean)
+            const isBest = document.getElementById('is_best').checked;
+            formData.append('is_best', isBest ? '1' : '0');
+
+            // Add PDF document if selected
+            const documentFile = document.getElementById('documentUrl').files[0];
+            if (documentFile) {
+                formData.append('documentUrl', documentFile);
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+            const response = document.getElementById('response');
+
+            // Show loading
+            submitBtn.disabled = true;
+            loading.classList.add('active');
+            response.style.display = 'none';
+
+            try {
+                const res = await fetch('http://localhost:8000/api/journals', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const data = await res.json();
+
+                // Hide loading
+                loading.classList.remove('active');
+                submitBtn.disabled = false;
+
+                // Show response
+                response.style.display = 'block';
+
+                if (res.ok) {
+                    response.className = 'response success';
+                    response.innerHTML = `
+                        <h3>✅ Berhasil!</h3>
+                        <p>${data.message}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+
+                    // Reset form
+                    form.reset();
+                    document.getElementById('date').valueAsDate = new Date();
+                    document.getElementById('pdfInfo').innerHTML = '';
+
+                    // Scroll to response
+                    response.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    response.className = 'response error';
+                    response.innerHTML = `
+                        <h3>❌ Error!</h3>
+                        <p>${data.message || 'Terjadi kesalahan'}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+
+            } catch (error) {
+                loading.classList.remove('active');
+                submitBtn.disabled = false;
+
+                response.style.display = 'block';
+                response.className = 'response error';
+                response.innerHTML = `
+                    <h3>❌ Error!</h3>
+                    <p>Gagal menghubungi server. Pastikan server Laravel sedang berjalan.</p>
+                    <pre>${error.message}</pre>
+                `;
+            }
+        });
+    </script>
+</body>
+
+</html>

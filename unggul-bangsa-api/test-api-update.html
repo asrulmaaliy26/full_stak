@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API UPDATE - Unggul Bangsa</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .control-panel {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 100px;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            color: white;
+            transition: 0.2s;
+            width: 100%;
+        }
+
+        .btn-blue {
+            background: #3498db;
+        }
+
+        .btn-blue:hover {
+            background: #2980b9;
+        }
+
+        .btn-green {
+            background: #27ae60;
+            margin-top: 20px;
+            font-size: 16px;
+            padding: 15px;
+        }
+
+        .btn-green:hover {
+            background: #219150;
+        }
+
+        .preview-box {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .preview-box img,
+        .preview-box .doc-preview {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+
+        .doc-preview {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            font-size: 10px;
+            text-align: center;
+            padding: 5px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .response-area {
+            margin-top: 30px;
+            background: #2c3e50;
+            color: #badc58;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: monospace;
+            overflow-x: auto;
+            display: none;
+        }
+
+        .error-res {
+            color: #ff7675;
+        }
+
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loader::after {
+            content: "Loading...";
+            font-weight: bold;
+            color: #3498db;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>🔄 Test API UPDATE (PUT)</h1>
+            <p>Edit News, Projects, & Journals</p>
+        </div>
+
+        <div class="content">
+            <!-- Control Panel -->
+            <div class="control-panel">
+                <div>
+                    <label>Resource Type</label>
+                    <select id="resourceType">
+                        <option value="news">News</option>
+                        <option value="projects">Projects</option>
+                        <option value="journals">Journals</option>
+                    </select>
+                </div>
+                <div>
+                    <label>ID Data</label>
+                    <input type="number" id="resourceId" placeholder="Contoh: 1">
+                </div>
+                <button class="btn btn-blue" id="loadBtn">Load</button>
+            </div>
+
+            <div id="loader" class="loader"></div>
+
+            <!-- Dynamic Form -->
+            <form id="updateForm" class="hidden">
+                <div id="formFields"></div>
+
+                <button type="submit" class="btn btn-green">Update Data</button>
+            </form>
+
+            <!-- Response -->
+            <div id="responseArea" class="response-area"></div>
+        </div>
+    </div>
+
+    <script>
+        const baseUrl = 'http://localhost:8000/api';
+
+        // UI Elements
+        const resourceType = document.getElementById('resourceType');
+        const resourceId = document.getElementById('resourceId');
+        const loadBtn = document.getElementById('loadBtn');
+        const updateForm = document.getElementById('updateForm');
+        const formFields = document.getElementById('formFields');
+        const responseArea = document.getElementById('responseArea');
+        const loader = document.getElementById('loader');
+
+        // Field Configs
+        const configs = {
+            news: [
+                { name: 'title', label: 'Judul', type: 'text' },
+                { name: 'category', label: 'Kategori', type: 'select', options: ['Prestasi', 'Kegiatan', 'Pengumuman', 'Wisuda', 'Seminar', 'Lainnya'] },
+                { name: 'level', label: 'Level (Khusus Prestasi)', type: 'select', options: ['Sekolah', 'Kecamatan', 'Kabupaten', 'Provinsi', 'Nasional', 'Internasional'] },
+                { name: 'jenjang', label: 'Jenjang', type: 'select', options: ['tk', 'mi', 'smp', 'ma', 'stai'] },
+                { name: 'date', label: 'Tanggal', type: 'date' },
+                { name: 'excerpt', label: 'Ringkasan', type: 'textarea' },
+                { name: 'content', label: 'Konten', type: 'textarea' },
+                { name: 'main_image', label: 'Main Image (Optional)', type: 'file' },
+                { name: 'gallery', label: 'Gallery (Optional)', type: 'file', multiple: true },
+            ],
+            projects: [
+                { name: 'title', label: 'Judul Proyek', type: 'text' },
+                { name: 'category', label: 'Kategori', type: 'select', options: ['Sains', 'Teknologi', 'Sosial', 'Lingkungan', 'Lainnya'] },
+                { name: 'jenjang', label: 'Jenjang', type: 'select', options: ['tk', 'mi', 'smp', 'ma', 'stai'] },
+                { name: 'author', label: 'Penulis', type: 'text' },
+                { name: 'date', label: 'Tanggal', type: 'date' },
+                { name: 'description', label: 'Deskripsi', type: 'textarea' },
+                { name: 'imageUrl', label: 'Gambar Project (Optional)', type: 'file' },
+                { name: 'documents', label: 'Dokumen (Optional)', type: 'file', multiple: true },
+            ],
+            journals: [
+                { name: 'title', label: 'Judul Jurnal', type: 'text' },
+                { name: 'category', label: 'Kategori', type: 'text' },
+                { name: 'jenjang', label: 'Jenjang', type: 'select', options: ['tk', 'mi', 'smp', 'ma', 'stai'] },
+                { name: 'author', label: 'Penulis', type: 'text' },
+                { name: 'mentor', label: 'Mentor', type: 'text' },
+                { name: 'score', label: 'Score (0-100)', type: 'number' },
+                { name: 'is_best', label: 'Best Journal?', type: 'checkbox' },
+                { name: 'date', label: 'Tanggal', type: 'date' },
+                { name: 'abstract', label: 'Abstrak', type: 'textarea' },
+                { name: 'documentUrl', label: 'File PDF (Optional)', type: 'file' },
+            ]
+        };
+
+        // Load Data
+        loadBtn.addEventListener('click', async () => {
+            const type = resourceType.value;
+            const id = resourceId.value;
+
+            if (!id) return alert('Masukkan ID dulu!');
+
+            loader.style.display = 'block';
+            updateForm.classList.add('hidden');
+            responseArea.style.display = 'none';
+            formFields.innerHTML = '';
+
+            try {
+                const res = await fetch(`${baseUrl}/${type}/${id}`);
+                const json = await res.json();
+
+                if (!res.ok) throw new Error(json.message || 'Gagal load data');
+
+                renderForm(type, json.data);
+                updateForm.classList.remove('hidden');
+
+            } catch (err) {
+                responseArea.style.display = 'block';
+                responseArea.innerHTML = `<span class="error-res">Error: ${err.message}</span>`;
+            } finally {
+                loader.style.display = 'none';
+            }
+        });
+
+        // Render Form
+        function renderForm(type, data) {
+            const fields = configs[type];
+
+            fields.forEach(field => {
+                const div = document.createElement('div');
+                div.className = 'form-group';
+
+                const label = document.createElement('label');
+                label.textContent = field.label;
+                div.appendChild(label);
+
+                let input;
+
+                if (field.type === 'textarea') {
+                    input = document.createElement('textarea');
+                    input.value = data[field.name] || '';
+                } else if (field.type === 'select') {
+                    input = document.createElement('select');
+                    field.options.forEach(opt => {
+                        const option = document.createElement('option');
+                        option.value = opt.toLowerCase() === 'sekolah' ? 'Sekolah' : opt.toLowerCase(); // Handle case sensitivity simplistically
+                        option.textContent = opt;
+                        if (opt === 'Sekolah') option.value = 'Sekolah'; // Fix case
+
+                        // Simple logic to match value
+                        const dataVal = (data[field.name] || '').toString().toLowerCase();
+                        const optVal = option.value.toLowerCase();
+                        if (dataVal === optVal) option.selected = true;
+
+                        input.appendChild(option);
+                    });
+                } else if (field.type === 'file') {
+                    input = document.createElement('input');
+                    input.type = 'file';
+                    if (field.multiple) input.multiple = true;
+
+                    // Show preview of existing file
+                    const existingUrl = data[field.name];
+                    if (existingUrl) {
+                        const preview = document.createElement('div');
+                        preview.className = 'preview-box';
+
+                        const urls = Array.isArray(existingUrl) ? existingUrl : [existingUrl];
+
+                        urls.forEach(item => {
+                            let url = item;
+                            // Check if item is object (like in projects documents)
+                            if (typeof item === 'object' && item !== null && item.url) {
+                                url = item.url;
+                            }
+
+                            if (typeof url === 'string' && url.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
+                                preview.innerHTML += `<img src="${url}" target="_blank">`;
+                            } else {
+                                const displayUrl = typeof url === 'string' ? url : '#';
+                                preview.innerHTML += `<a href="${displayUrl}" target="_blank" class="doc-preview">📄 File</a>`;
+                            }
+                        });
+
+                        div.appendChild(preview);
+                    }
+                } else if (field.type === 'checkbox') {
+                    input = document.createElement('input');
+                    input.type = 'checkbox';
+                    input.checked = data[field.name] ? true : false;
+                    // Checkbox needs special styling usually, but let's keep it simple
+                } else {
+                    input = document.createElement('input');
+                    input.type = field.type;
+                    input.value = data[field.name] || '';
+                }
+
+                input.name = field.name;
+                input.id = `input_${field.name}`;
+                div.appendChild(input);
+                formFields.appendChild(div);
+            });
+        }
+
+        // Submit Update
+        updateForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const type = resourceType.value;
+            const id = resourceId.value;
+            const formData = new FormData();
+
+            // METHOD SPOOFING: Important for Laravel PUT with Files
+            formData.append('_method', 'PUT');
+
+            const inputs = updateForm.querySelectorAll('input, select, textarea');
+
+            inputs.forEach(input => {
+                if (input.type === 'file') {
+                    if (input.files.length > 0) {
+                        if (input.multiple) {
+                            for (let i = 0; i < input.files.length; i++) {
+                                formData.append(input.name + '[]', input.files[i]); // Add [] for arrays
+                            }
+                            // Special fix for name='gallery' becoming 'gallery[]' automatically?
+                            // Actually in my config I named it 'gallery', but PHP expects 'gallery[]' for multiple
+                            // Let's rely on name attribute.
+                            // My config: name: 'gallery'. 
+                            // If I simple append 'gallery', PHP sees one file.
+                            // I need to change logic below.
+                        } else {
+                            formData.append(input.name, input.files[0]);
+                        }
+                    }
+                } else if (input.type === 'checkbox') {
+                    formData.append(input.name, input.checked ? '1' : '0');
+                } else {
+                    // Non-file inputs
+                    formData.append(input.name, input.value);
+                }
+            });
+
+            // SPECIAL HANDLING FOR GALLERY & DOCUMENTS ARRAY
+            // My simple loop above for files needs to be robust:
+            // If config says multiple, I must append with []
+            // Let's redo file handling manually to be safe
+            const fileInputs = Array.from(updateForm.querySelectorAll('input[type="file"]'));
+            fileInputs.forEach(input => {
+                // Remove from prev loop if added (formData has unique keys, wait, append adds)
+                // To avoid duplication, I should have skipped files in the main loop.
+                // But let's clarify:
+                // My main loop key is input.name.
+                // For gallery, input.name is 'gallery'.
+                // If multiple, I want 'gallery[]'.
+
+                // Let's simplistic fix:
+                // In config I didn't verify names.
+                // Let's delete the entry from formData and re-add if it's a file
+                formData.delete(input.name);
+                // Wait, formData.delete removes all entries with that name. Good.
+
+                if (input.files.length > 0) {
+                    if (input.multiple) {
+                        for (let i = 0; i < input.files.length; i++) {
+                            // Force '[]' suffix for multiple files
+                            const name = input.name.endsWith('[]') ? input.name : input.name + '[]';
+                            formData.append(name, input.files[i]);
+                        }
+                    } else {
+                        formData.append(input.name, input.files[0]);
+                    }
+                }
+            });
+
+
+            responseArea.style.display = 'none';
+            loader.style.display = 'block';
+
+            try {
+                // NOTE: We use POST with _method=PUT
+                const res = await fetch(`${baseUrl}/${type}/${id}`, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const json = await res.json();
+
+                responseArea.style.display = 'block';
+                if (res.ok) {
+                    responseArea.innerHTML = `<h3>✅ Berhasil Update!</h3><pre>${JSON.stringify(json, null, 2)}</pre>`;
+
+                    // Refresh data preview
+                    // Maybe reload the form with new data?
+                    // renderForm(type, json.data); // optional
+                    window.scrollTo(0, document.body.scrollHeight);
+                } else {
+                    responseArea.innerHTML = `<h3 class="error-res">❌ Gagal Update</h3><pre>${JSON.stringify(json, null, 2)}</pre>`;
+                }
+
+            } catch (err) {
+                responseArea.style.display = 'block';
+                responseArea.innerHTML = `<span class="error-res">Critical Error: ${err.message}</span>`;
+            } finally {
+                loader.style.display = 'none';
+            }
+        });
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API POST Projects - Unggul Bangsa</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        label .required {
+            color: #e74c3c;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #f093fb;
+            box-shadow: 0 0 0 3px rgba(240, 147, 251, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px dashed #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        input[type="file"]:hover {
+            border-color: #f093fb;
+            background: #fff5fd;
+        }
+
+        .file-info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(240, 147, 251, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 13px;
+            width: auto;
+            margin-top: 5px;
+        }
+
+        .response {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .response.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .response.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .response h3 {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .response pre {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #f093fb;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .preview-image {
+            margin-top: 10px;
+        }
+
+        .preview-image img {
+            width: 200px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .document-item {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .document-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .document-item-header strong {
+            color: #333;
+            font-size: 14px;
+        }
+
+        .btn-remove {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-remove:hover {
+            background: #c82333;
+        }
+
+        .document-fields {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .document-fields select,
+        .document-fields input {
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+
+        #documentsContainer {
+            margin-top: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📁 Test API POST Projects</h1>
+            <p>Form untuk testing endpoint POST /api/projects dengan metadata dokumen</p>
+        </div>
+
+        <div class="form-container">
+            <form id="projectForm">
+                <div class="form-group">
+                    <label for="title">Judul Proyek <span class="required">*</span></label>
+                    <input type="text" id="title" name="title" required
+                        placeholder="Contoh: Penelitian Energi Terbarukan">
+                </div>
+
+                <div class="form-group">
+                    <label for="category">Kategori <span class="required">*</span></label>
+                    <select id="category" name="category" required>
+                        <option value="">-- Pilih Kategori --</option>
+                        <option value="Penelitian">Penelitian</option>
+                        <option value="Pengabdian Masyarakat">Pengabdian Masyarakat</option>
+                        <option value="Karya Ilmiah">Karya Ilmiah</option>
+                        <option value="Inovasi">Inovasi</option>
+                        <option value="Kompetisi">Kompetisi</option>
+                        <option value="Lainnya">Lainnya</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Deskripsi <span class="required">*</span></label>
+                    <textarea id="description" name="description" required
+                        placeholder="Deskripsi lengkap proyek..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="author">Penulis/Author <span class="required">*</span></label>
+                    <input type="text" id="author" name="author" required placeholder="Contoh: Dr. Ahmad Fauzi, M.Pd">
+                </div>
+
+                <div class="form-group">
+                    <label for="date">Tanggal <span class="required">*</span></label>
+                    <input type="date" id="date" name="date" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="jenjang">Jenjang <span class="required">*</span></label>
+                    <select id="jenjang" name="jenjang" required>
+                        <option value="">-- Pilih Jenjang --</option>
+                        <option value="TK">TK</option>
+                        <option value="MI">MI</option>
+                        <option value="SMPT">SMPT</option>
+                        <option value="MA">MA</option>
+                        <option value="KAMPUS">KAMPUS</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="imageUrl">Gambar Proyek <span class="required">*</span></label>
+                    <input type="file" id="imageUrl" name="imageUrl" accept="image/*" required>
+                    <div class="file-info">Format: JPG, PNG, GIF, SVG, WebP (Max: 2MB)</div>
+                    <div id="imagePreview" class="preview-image"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Dokumen Pendukung (Opsional)</label>
+                    <input type="file" id="documentInput" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx" multiple>
+                    <div class="file-info">Format: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX (Max: 5MB per file)</div>
+                    <div id="documentsContainer"></div>
+                </div>
+
+                <button type="submit" class="btn" id="submitBtn">
+                    📤 Kirim Proyek
+                </button>
+            </form>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Mengirim data...</p>
+            </div>
+
+            <div class="response" id="response"></div>
+        </div>
+    </div>
+
+    <script>
+        // Set default date to today
+        document.getElementById('date').valueAsDate = new Date();
+
+        // Store documents data
+        let documentsData = [];
+
+        // Preview image
+        document.getElementById('imageUrl').addEventListener('change', function (e) {
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = '';
+
+            if (e.target.files.length > 0) {
+                const file = e.target.files[0];
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                preview.appendChild(img);
+            }
+        });
+
+        // Handle document selection
+        document.getElementById('documentInput').addEventListener('change', function (e) {
+            const files = Array.from(e.target.files);
+
+            files.forEach(file => {
+                const id = Date.now() + Math.random();
+                const extension = file.name.split('.').pop().toLowerCase();
+
+                documentsData.push({
+                    id: id,
+                    file: file,
+                    type: 'document',
+                    title: file.name.replace(/\.[^/.]+$/, ""),
+                    format: extension
+                });
+            });
+
+            renderDocuments();
+            e.target.value = ''; // Reset input
+        });
+
+        function renderDocuments() {
+            const container = document.getElementById('documentsContainer');
+            container.innerHTML = '';
+
+            documentsData.forEach((doc, index) => {
+                const item = document.createElement('div');
+                item.className = 'document-item';
+                item.innerHTML = `
+                    <div class="document-item-header">
+                        <strong>📄 ${doc.file.name}</strong>
+                        <button type="button" class="btn-remove" onclick="removeDocument(${index})">✕ Hapus</button>
+                    </div>
+                    <div class="document-fields">
+                        <select class="doc-type" data-index="${index}">
+                            <option value="document" ${doc.type === 'document' ? 'selected' : ''}>Document</option>
+                            <option value="proposal" ${doc.type === 'proposal' ? 'selected' : ''}>Proposal</option>
+                            <option value="report" ${doc.type === 'report' ? 'selected' : ''}>Report</option>
+                            <option value="presentation" ${doc.type === 'presentation' ? 'selected' : ''}>Presentation</option>
+                            <option value="data" ${doc.type === 'data' ? 'selected' : ''}>Data</option>
+                            <option value="other" ${doc.type === 'other' ? 'selected' : ''}>Other</option>
+                        </select>
+                        <input type="text" class="doc-title" data-index="${index}" 
+                               value="${doc.title}" placeholder="Judul dokumen">
+                    </div>
+                    <div class="file-info" style="margin-top: 8px;">
+                        Format: ${doc.format.toUpperCase()} | Size: ${(doc.file.size / 1024).toFixed(2)} KB
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+
+            // Add event listeners for type and title changes
+            document.querySelectorAll('.doc-type').forEach(select => {
+                select.addEventListener('change', function () {
+                    const index = parseInt(this.dataset.index);
+                    documentsData[index].type = this.value;
+                });
+            });
+
+            document.querySelectorAll('.doc-title').forEach(input => {
+                input.addEventListener('input', function () {
+                    const index = parseInt(this.dataset.index);
+                    documentsData[index].title = this.value;
+                });
+            });
+        }
+
+        function removeDocument(index) {
+            documentsData.splice(index, 1);
+            renderDocuments();
+        }
+
+        // Handle form submission
+        document.getElementById('projectForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const form = e.target;
+            const formData = new FormData();
+
+            // Add basic fields
+            formData.append('title', document.getElementById('title').value);
+            formData.append('category', document.getElementById('category').value);
+            formData.append('description', document.getElementById('description').value);
+            formData.append('author', document.getElementById('author').value);
+            formData.append('date', document.getElementById('date').value);
+            formData.append('jenjang', document.getElementById('jenjang').value);
+            formData.append('imageUrl', document.getElementById('imageUrl').files[0]);
+
+            // Add documents with metadata
+            documentsData.forEach((doc, index) => {
+                formData.append(`documents[]`, doc.file);
+                formData.append(`document_types[]`, doc.type);
+                formData.append(`document_titles[]`, doc.title);
+            });
+
+            const submitBtn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+            const response = document.getElementById('response');
+
+            // Show loading
+            submitBtn.disabled = true;
+            loading.classList.add('active');
+            response.style.display = 'none';
+
+            try {
+                const res = await fetch('http://localhost:8000/api/projects', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const data = await res.json();
+
+                // Hide loading
+                loading.classList.remove('active');
+                submitBtn.disabled = false;
+
+                // Show response
+                response.style.display = 'block';
+
+                if (res.ok) {
+                    response.className = 'response success';
+                    response.innerHTML = `
+                        <h3>✅ Berhasil!</h3>
+                        <p>${data.message}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+
+                    // Reset form
+                    form.reset();
+                    documentsData = [];
+                    document.getElementById('imagePreview').innerHTML = '';
+                    document.getElementById('documentsContainer').innerHTML = '';
+                    document.getElementById('date').valueAsDate = new Date();
+
+                    // Scroll to response
+                    response.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    response.className = 'response error';
+                    response.innerHTML = `
+                        <h3>❌ Error!</h3>
+                        <p>${data.message || 'Terjadi kesalahan'}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+
+            } catch (error) {
+                loading.classList.remove('active');
+                submitBtn.disabled = false;
+
+                response.style.display = 'block';
+                response.className = 'response error';
+                response.innerHTML = `
+                    <h3>❌ Error!</h3>
+                    <p>Gagal menghubungi server. Pastikan server Laravel sedang berjalan.</p>
+                    <pre>${error.message}</pre>
+                `;
+            }
+        });
+    </script>
+</body>
+
+</html>

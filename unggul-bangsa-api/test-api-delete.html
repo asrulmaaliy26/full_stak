@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API DELETE - Unggul Bangsa</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #dfe6e9;
+            padding: 20px;
+            color: #2d3436;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #d63031;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        select,
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #b2bec3;
+            border-radius: 6px;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            color: white;
+            background: #d63031;
+            transition: 0.2s;
+        }
+
+        .btn:hover {
+            background: #c0392b;
+        }
+
+        .btn:disabled {
+            background: #b2bec3;
+            cursor: not-allowed;
+        }
+
+        .response-area {
+            margin-top: 20px;
+            padding: 15px;
+            background: #2d3436;
+            color: #55efc4;
+            border-radius: 6px;
+            display: none;
+            overflow-x: auto;
+        }
+
+        .error {
+            color: #ff7675;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>🗑️ Test API DELETE</h1>
+            <p>Hapus Data News, Projects, & Journals</p>
+        </div>
+
+        <div class="content">
+            <label>Pilih Resource</label>
+            <select id="resourceType">
+                <option value="news">News</option>
+                <option value="projects">Projects</option>
+                <option value="journals">Journals</option>
+            </select>
+
+            <label>ID Data</label>
+            <input type="number" id="resourceId" placeholder="Masukkan ID yang akan dihapus...">
+
+            <button class="btn" id="deleteBtn">HAPUS DATA PERMANEN</button>
+
+            <div id="responseArea" class="response-area"></div>
+        </div>
+    </div>
+
+    <script>
+        const deleteBtn = document.getElementById('deleteBtn');
+        const responseArea = document.getElementById('responseArea');
+
+        deleteBtn.addEventListener('click', async () => {
+            const type = document.getElementById('resourceType').value;
+            const id = document.getElementById('resourceId').value;
+
+            if (!id) {
+                alert('Masukkan ID dulu!');
+                return;
+            }
+
+            if (!confirm(`Yakin ingin menghapus ${type} dengan ID ${id}? Tindakan ini tidak bisa dibatalkan!`)) {
+                return;
+            }
+
+            deleteBtn.disabled = true;
+            deleteBtn.textContent = 'Menghapus...';
+            responseArea.style.display = 'none';
+
+            try {
+                const res = await fetch(`http://localhost:8000/api/${type}/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const data = await res.json();
+
+                responseArea.style.display = 'block';
+                if (res.ok) {
+                    responseArea.innerHTML = `✅ Sukses: ${data.message}`;
+                } else {
+                    responseArea.innerHTML = `<span class="error">❌ Gagal: ${data.message || 'Error tidak diketahui'}</span>`;
+                }
+
+            } catch (err) {
+                responseArea.style.display = 'block';
+                responseArea.innerHTML = `<span class="error">❌ Error Sistem: ${err.message}</span>`;
+            } finally {
+                deleteBtn.disabled = false;
+                deleteBtn.textContent = 'HAPUS DATA PERMANEN';
+            }
+        });
+    </script>
+
+</body>
+
+</html>
