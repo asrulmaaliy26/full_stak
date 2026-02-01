@@ -102,7 +102,7 @@ const EditJournal: React.FC = () => {
         mentor,
         score,
         date: today,
-        jenjang: jenjang.toLowerCase(),
+        jenjang: jenjang,
         is_best: isBest,
         documentUrl: newFile || undefined,
       });

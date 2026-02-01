@@ -145,7 +145,7 @@ const EditProject: React.FC = () => {
             description,
             author,
             date: today,
-            jenjang: jenjang.toLowerCase(),
+            jenjang: jenjang,
             imageUrl: imageFile || undefined,
             documents: validNewDocs.length > 0 ? validNewDocs.map(d => d.file!) : undefined,
             document_types: validNewDocs.length > 0 ? validNewDocs.map(d => d.type) : undefined,

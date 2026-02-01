@@ -107,7 +107,7 @@ const CreateProject: React.FC = () => {
         description,
         author,
         date: today,
-        jenjang: jenjang.toLowerCase(),
+        jenjang: jenjang,
         imageUrl: imageFile || undefined,
         documents: validDocs.length > 0 ? validDocs.map(d => d.file!) : undefined,
         document_types: validDocs.length > 0 ? validDocs.map(d => d.type) : undefined,

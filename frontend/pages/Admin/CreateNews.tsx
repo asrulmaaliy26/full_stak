@@ -124,7 +124,7 @@ const CreateNews: React.FC = () => {
         content,
         date: today,
         category,
-        jenjang: jenjang.toLowerCase(), // Convert to lowercase for API
+        jenjang: jenjang, // Convert to lowercase for API
         level: category === 'Prestasi' ? level : undefined,
         main_image: mainImage || undefined,
         gallery: validGallery.length > 0 ? validGallery : undefined,

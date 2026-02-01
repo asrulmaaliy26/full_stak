@@ -153,7 +153,7 @@ const EditNews: React.FC = () => {
         content,
         date: today,
         category,
-        jenjang: jenjang.toLowerCase(),
+        jenjang: jenjang,
         level: category === 'Prestasi' ? level : undefined,
         main_image: mainImage || undefined,
         gallery: validGallery.length > 0 ? validGallery : undefined,
