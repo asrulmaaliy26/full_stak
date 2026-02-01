@@ -16,5 +16,8 @@ class Message extends Model
         'category',
         'type',
         'jenjang',
+        'reply_subject',
+        'reply_content',
+        'replied_at',
     ];
 }

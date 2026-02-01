@@ -36,6 +36,7 @@ Route::delete('/news/{id}/gallery', [NewsController::class, 'deleteGalleryImage'
 Route::get('/news/limit/{count}/{jenjang?}', [NewsController::class, 'limit']);
 Route::get('/news/category/{category}', [NewsController::class, 'getByCategory']); // Filter by Category
 Route::get('/news/{id}', [NewsController::class, 'show']);
+Route::post('/news/{id}/views', [NewsController::class, 'incrementViews']);
 
 // Project Routes
 Route::get('/projects', [ProjectController::class, 'index']);

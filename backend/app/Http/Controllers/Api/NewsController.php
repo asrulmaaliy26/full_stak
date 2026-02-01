@@ -234,4 +234,19 @@ class NewsController extends Controller
             'message' => 'Berita berhasil dihapus'
         ], 200);
     }
+    public function incrementViews($id)
+    {
+        \Illuminate\Support\Facades\Log::info("Incrementing views for news ID: $id");
+        $news = News::find($id);
+
+        if (!$news) {
+            return response()->json(['message' => 'Not found'], 404);
+        }
+
+        $news->increment('views');
+        
+        \Illuminate\Support\Facades\Log::info("New views: " . $news->views);
+
+        return response()->json(['message' => 'Views incremented', 'views' => $news->views]);
+    }
 }

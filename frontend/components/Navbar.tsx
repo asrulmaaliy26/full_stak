@@ -33,7 +33,6 @@ const Navbar: React.FC = () => {
     { name: 'Berita', path: '/berita' },
     { name: 'Praktek', path: '/projek' },
     { name: 'Jurnal', path: '/jurnal' },
-    { name: 'Fasilitas', path: '/fasilitas' },
   ];
 
   const aboutLinks = [
@@ -41,9 +40,26 @@ const Navbar: React.FC = () => {
     { name: 'Profil Lengkap', path: '/tentang/profil' },
     { name: 'Struktur Organisasi', path: '/tentang/struktur' },
     { name: 'Prestasi', path: '/tentang/prestasi' },
+    { name: 'Fasilitas', path: '/fasilitas' },
   ];
 
   const isActive = (path: string) => location.pathname === path;
+
+  const handleLevelClick = (level: string) => {
+    const externalLinks: Record<string, string> = {
+      'MI': 'https://mi.lpialhidayah.or.id',
+      'SMPT': 'https://smpt.lpialhidayah.or.id',
+      'MA': 'https://ma.lpialhidayah.or.id',
+    };
+
+    if (externalLinks[level]) {
+      window.location.href = externalLinks[level];
+    } else {
+      setActiveLevel(level);
+      setIsLevelSelectorOpen(false);
+      setIsOpen(false);
+    }
+  };
 
   return (
     <nav className="bg-white border-b border-slate-100 sticky top-0 z-50 shadow-sm transition-all duration-500">
@@ -66,16 +82,18 @@ const Navbar: React.FC = () => {
                 <ChevronDown className="w-3 h-3" />
               </button>
               {isLevelSelectorOpen && (
-                <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-slate-100 shadow-2xl rounded-2xl overflow-hidden py-2 animate-fadeIn z-[60]">
-                  {levels.map(l => (
-                    <button
-                      key={l}
-                      onClick={() => { setActiveLevel(l); setIsLevelSelectorOpen(false); }}
-                      className={`w-full text-left px-5 py-3 text-xs font-black hover:bg-slate-50 transition-colors ${activeLevel === l ? 'text-islamic-gold-500' : 'text-slate-600'}`}
-                    >
-                      {l === 'UMUM' ? 'Pusat (Umum)' : l}
-                    </button>
-                  ))}
+                <div className="absolute top-full left-0 pt-2 w-48 z-[60]">
+                  <div className="bg-white border border-slate-100 shadow-2xl rounded-2xl overflow-hidden py-2 animate-fadeIn">
+                    {levels.map(l => (
+                      <button
+                        key={l}
+                        onClick={() => handleLevelClick(l)}
+                        className={`w-full text-left px-5 py-3 text-xs font-black hover:bg-slate-50 transition-colors ${activeLevel === l ? 'text-islamic-gold-500' : 'text-slate-600'}`}
+                      >
+                        {l === 'UMUM' ? 'Pusat (Umum)' : l}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
@@ -123,7 +141,12 @@ const Navbar: React.FC = () => {
 
             <div className="h-8 w-px bg-slate-100 mx-4"></div>
 
-            <Link to="/admin" className="p-2.5 rounded-xl text-slate-400 hover:text-slate-900 transition-all">
+            {/* Admin Link - Mobile */}
+            <Link
+              to="/admin"
+              className="flex items-center justify-center gap-2 px-4 py-3 text-sm font-black rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all"
+              onClick={() => setIsOpen(false)}
+            >
               <UserCog className="w-5 h-5" />
             </Link>
 
@@ -163,7 +186,7 @@ const Navbar: React.FC = () => {
             {levels.map(l => (
               <button
                 key={l}
-                onClick={() => setActiveLevel(l)}
+                onClick={() => handleLevelClick(l)}
                 className={`py-2 rounded-lg text-[10px] font-black border transition-all ${activeLevel === l ? 'bg-slate-900 text-white' : 'bg-slate-50 text-slate-400 border-slate-100'}`}
               >
                 {l}
