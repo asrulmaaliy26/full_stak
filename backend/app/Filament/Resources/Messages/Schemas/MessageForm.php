@@ -30,14 +30,7 @@ class MessageForm
 
                 \Filament\Forms\Components\Select::make('jenjang')
                     ->label('Jenjang')
-                    ->options([
-                        'TK' => 'TK',
-                        'MI' => 'MI',
-                        'SMPT' => 'SMPT',
-                        'MA' => 'MA',
-                        'KAMPUS' => 'KAMPUS',
-                        'UMUM' => 'UMUM',
-                    ])
+                    ->options(\App\Support\Jenjang::options())
                     ->native(false),
 
                 \Filament\Forms\Components\Textarea::make('message')

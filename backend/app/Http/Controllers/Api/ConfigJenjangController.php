@@ -38,6 +38,20 @@ class ConfigJenjangController extends Controller
                 'text' => 'text-indigo-600',
                 'type' => 'Sekolah Tinggi Agama Islam'
             ],
+            'TPQ' => [
+                'color' => 'orange',
+                'name' => 'TPQ AL Hidayah',
+                'bg' => 'bg-orange-600',
+                'text' => 'text-orange-600',
+                'type' => 'Taman Pendidikan Al-Qur\'an'
+            ],
+            'MADIN' => [
+                'color' => 'green',
+                'name' => 'MADIN AL Hidayah',
+                'bg' => 'bg-green-600',
+                'text' => 'text-green-600',
+                'type' => 'Madrasah Diniyah'
+            ],
             'UMUM' => [
                 'color' => 'slate',
                 'name' => 'Yayasan AL Mannan',

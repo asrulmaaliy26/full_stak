@@ -34,6 +34,17 @@ class HomeController extends Controller
                     ['label' => 'Guru', 'value' => 60],
                     ['label' => 'Ruang Kelas', 'value' => 24],
                 ],
+                'TPQ' => [
+                    ['label' => 'Total Santri', 'value' => 500],
+                    ['label' => 'Ustadz/Ustadzah', 'value' => 25],
+                    ['label' => 'Ruang Kelas', 'value' => 10],
+                ],
+                'MADIN' => [
+                    ['label' => 'Santri', 'value' => '100+'],
+                    ['label' => 'Ustadz/ah', 'value' => 15],
+                    ['label' => 'Gedung', 'value' => 1],
+                    ['label' => 'Alumni', 'value' => '50+'],
+                ],
                 'UMUM' => [
                     ['label' => 'Total Siswa', 'value' => 11100],
                     ['label' => 'Guru', 'value' => 60],

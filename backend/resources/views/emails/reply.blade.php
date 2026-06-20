@@ -14,14 +14,14 @@
 <body>
     <div class="container">
         <div class="header">
-            <h2>LPI Al Hidayah</h2>
+            <h2>TPQ Al Hidayah</h2>
         </div>
         <div class="content">
             {!! nl2br(e($replyContent)) !!}
         </div>
         <div class="footer">
-            <p>&copy; {{ date('Y') }} LPI Al Hidayah. All rights reserved.</p>
-            <p>Jl. Kauman No.1, Kec. Kauman, Kab. Tulungagung, Jawa Timur</p>
+            <p>&copy; {{ date('Y') }} TPQ Al Hidayah. All rights reserved.</p>
+            <p>Jl. KH. Hasyim Asy'ari 52 Gg 3, Desa Kauman, Kec. Kauman, Kab. Tulungagung.</p>
         </div>
     </div>
 </body>

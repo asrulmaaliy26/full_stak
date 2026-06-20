@@ -12,12 +12,8 @@ class FacilityForm
             ->components([
                 \Filament\Forms\Components\TextInput::make('name')->required(),
                 \Filament\Forms\Components\Select::make('jenjang')
-                    ->options([
-                        'KAMPUS' => 'Kampus',
-                        'MA' => 'MA',
-                        'SMPT' => 'SMPT',
-                        'MI' => 'MI',
-                    ])->required(),
+                    ->options(\App\Support\Jenjang::options())
+                    ->required(),
                 \Filament\Forms\Components\Select::make('type')->required()
                     ->options([
                         'ekstra' => 'ekstra',

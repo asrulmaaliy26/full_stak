@@ -57,14 +57,7 @@ class NewsForm
                     // Jenjang
                     Select::make('jenjang')
                         ->label('Jenjang Pendidikan')
-                        ->options([
-                            'TK' => 'TK',
-                            'MI' => 'MI',
-                            'SMPT' => 'SMPT',
-                            'MA' => 'MA',
-                            'KAMPUS' => 'Kampus / STAI',
-                            'UMUM' => 'Umum',
-                        ])
+                        ->options(\App\Support\Jenjang::options())
                         ->required()
                         ->native(false)
                         ->dehydrateStateUsing(fn ($state) => strtoupper($state)),

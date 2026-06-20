@@ -81,6 +81,34 @@ class AboutController extends Controller
                     'nama' => "Dr. Zainal Arifin",
                     'staff' => []
                 ]
+            ],
+            'TPQ' => [
+                'history' => "TPQ AL Hidayah berfokus pada pengajaran baca tulis Al-Qur'an dan dasar-dasar agama Islam sejak dini.",
+                'visi' => "Mencetak generasi yang cinta Al-Qur'an dan berakhlaqul karimah.",
+                'misi' => [
+                    "Metode pembelajaran yang menyenangkan.",
+                    "Hafalan doa-doa harian.",
+                    "Penerapan adab islami."
+                ],
+                'struktur' => [
+                    'pimpinan' => "Kepala TPQ",
+                    'nama' => "Ust. Mansyur, S.Pd.I",
+                    'staff' => []
+                ]
+            ],
+            'MADIN' => [
+                'history' => "Madrasah Diniyah Takmiliyah Awwaliyah (MDTA) Al-Hidayah secara resmi beroperasi di bawah naungan Yayasan Pondok Pesantren Al Mannan Kauman. Fokus utama lembaga ini pada pemahaman syariah, implementasi Al-Qur'an dan Sunnah, serta penekanan pada akhlakul karimah.",
+                'visi' => "Terwujudnya insan yang beriman, bertaqwa, dan berakhlakul karimah.",
+                'misi' => [
+                    "Membekali santri dalam ilmu agama ala Ahlussunnah Wal Jama'ah.",
+                    "Menanamkan nilai-nilai syariah dalam kehidupan sehari-hari.",
+                    "Mendidik dan membimbing santri dalam mengimplementasikan Al Qur'an dan Sunnah."
+                ],
+                'struktur' => [
+                    'pimpinan' => "Kepala Madrasah",
+                    'nama' => "Anma Muniri S. Hum.",
+                    'staff' => []
+                ]
             ]
         ];
     }

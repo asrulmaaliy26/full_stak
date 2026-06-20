@@ -101,7 +101,7 @@ Accept: application/json
 | content | string | ✅ Yes | Konten lengkap berita |
 | date | date | ✅ Yes | Tanggal berita (YYYY-MM-DD) |
 | category | string | ✅ Yes | Kategori berita |
-| jenjang | string | ✅ Yes | Jenjang (tk/mi/smp/ma/stai) |
+| jenjang | string | ✅ Yes | Jenjang (tk/mi/smp/ma/stai/tpq) |
 | main_image | file | ✅ Yes | Gambar utama (max 2MB) |
 | gallery[] | file[] | ❌ No | Array gambar galeri (max 2MB/file) |
 
