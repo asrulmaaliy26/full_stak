@@ -5,8 +5,8 @@ on:
     branches:
       - main
     paths:
-      - 'backend/**'
-      - 'frontend/**'
+      - "backend/**"
+      - "frontend/**"
   workflow_dispatch:
 
 jobs:
@@ -23,7 +23,7 @@ jobs:
       - name: 🟢 Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3' # Diubah ke PHP 8.3 agar sesuai dengan kebutuhan package (misal openspout)
+          php-version: "8.3" # Diubah ke PHP 8.3 agar sesuai dengan kebutuhan package (misal openspout)
           extensions: mbstring, xml, bcmath, curl, zip
           tools: composer:v2
 
@@ -80,13 +80,13 @@ jobs:
           script: |
             # Buat folder jika belum ada
             mkdir -p /home/staialmannan/admin.staialmannan.ac.id/backend
-            
+
             # Ekstrak file archive
             tar -xzf /home/staialmannan/admin.staialmannan.ac.id/backend.tar.gz -C /home/staialmannan/admin.staialmannan.ac.id/backend
-            
+
             # Hapus file archive setelah diekstrak
             rm -f /home/staialmannan/admin.staialmannan.ac.id/backend.tar.gz
-            
+
             # Pastikan file .env ada, jika tidak, copy dari .env.example (PENTING: Anda harus mengatur .env di server setelah ini)
             if [ ! -f /home/staialmannan/admin.staialmannan.ac.id/backend/.env ]; then
               cp /home/staialmannan/admin.staialmannan.ac.id/backend/.env.example /home/staialmannan/admin.staialmannan.ac.id/backend/.env
@@ -95,13 +95,13 @@ jobs:
 
             # Atur kepemilikan file (ownership) ke user Webuzo/cPanel
             chown -R staialmannan:staialmannan /home/staialmannan/admin.staialmannan.ac.id/backend
-            
+
             # Atur permission untuk storage dan bootstrap/cache agar bisa ditulis oleh Laravel
             chmod -R 775 /home/staialmannan/admin.staialmannan.ac.id/backend/storage
             chmod -R 775 /home/staialmannan/admin.staialmannan.ac.id/backend/bootstrap/cache
-            
+
             # (Opsional) Jalankan artisan optimize:clear jika perlu
             # cd /home/staialmannan/admin.staialmannan.ac.id/backend && php artisan optimize:clear
-            
+
             # Restart Apache
             /usr/local/apps/apache2/bin/apachectl graceful
