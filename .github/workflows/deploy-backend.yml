@@ -1,0 +1,107 @@
+name: 🚀 Auto Deploy - admin.staialmannan.ac.id (Laravel Backend)
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - name: 🛒 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2' # Sesuaikan dengan versi PHP server Anda
+          extensions: mbstring, xml, bcmath, curl, zip
+          tools: composer:v2
+
+      - name: 📦 Install Composer Dependencies
+        run: composer install --optimize-autoloader --no-dev --no-interaction --prefer-dist
+        working-directory: ./backend
+
+      - name: 🟢 Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: ⚛️ Build React Frontend
+        run: |
+          npm install
+          npm run build
+        working-directory: ./frontend
+
+      - name: 🔄 Copy React Build to Laravel
+        run: |
+          cp -r ../frontend/dist/* public/
+          mv public/index.html resources/views/react_app.blade.php
+        working-directory: ./backend
+
+      - name: 📦 Install NPM Dependencies & Build Backend (Vite Laravel)
+        run: |
+          npm install
+          npm run build
+        working-directory: ./backend
+
+      - name: 🗜️ Archive Backend Files
+        # Mengompresi semua file menjadi satu agar proses upload jauh lebih cepat daripada mengirim file satu per satu (terutama folder vendor/)
+        run: tar -czf backend.tar.gz * .env.example
+
+      - name: 📤 Upload Archive ke VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: root
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: 22
+          source: "backend/backend.tar.gz"
+          target: "/home/staialmannan/admin.staialmannan.ac.id"
+          strip_components: 1
+
+      - name: ♻️ Ekstrak dan Konfigurasi di VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: root
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: 22
+          script: |
+            # Buat folder jika belum ada
+            mkdir -p /home/staialmannan/admin.staialmannan.ac.id/backend
+            
+            # Ekstrak file archive
+            tar -xzf /home/staialmannan/admin.staialmannan.ac.id/backend.tar.gz -C /home/staialmannan/admin.staialmannan.ac.id/backend
+            
+            # Hapus file archive setelah diekstrak
+            rm -f /home/staialmannan/admin.staialmannan.ac.id/backend.tar.gz
+            
+            # Pastikan file .env ada, jika tidak, copy dari .env.example (PENTING: Anda harus mengatur .env di server setelah ini)
+            if [ ! -f /home/staialmannan/admin.staialmannan.ac.id/backend/.env ]; then
+              cp /home/staialmannan/admin.staialmannan.ac.id/backend/.env.example /home/staialmannan/admin.staialmannan.ac.id/backend/.env
+              echo "⚠️ File .env baru saja dibuat dari .env.example. Silakan atur koneksi database dan jalankan 'php artisan key:generate' di server!"
+            fi
+
+            # Atur kepemilikan file (ownership) ke user Webuzo/cPanel
+            chown -R staialmannan:staialmannan /home/staialmannan/admin.staialmannan.ac.id/backend
+            
+            # Atur permission untuk storage dan bootstrap/cache agar bisa ditulis oleh Laravel
+            chmod -R 775 /home/staialmannan/admin.staialmannan.ac.id/backend/storage
+            chmod -R 775 /home/staialmannan/admin.staialmannan.ac.id/backend/bootstrap/cache
+            
+            # (Opsional) Jalankan artisan optimize:clear jika perlu
+            # cd /home/staialmannan/admin.staialmannan.ac.id/backend && php artisan optimize:clear
+            
+            # Restart Apache
+            /usr/local/apps/apache2/bin/apachectl graceful
