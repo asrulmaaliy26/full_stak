@@ -33,7 +33,7 @@ class ConfigJenjangController extends Controller
             ],
             'KAMPUS' => [
                 'color' => 'indigo',
-                'name' => 'STAI AL Hidayah',
+                'name' => 'STAI AL Mannan',
                 'bg' => 'bg-indigo-600',
                 'text' => 'text-indigo-600',
                 'type' => 'Sekolah Tinggi Agama Islam'
