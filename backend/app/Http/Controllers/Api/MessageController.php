@@ -15,6 +15,8 @@ class MessageController extends Controller
             'contact_info' => 'required|string|max:255',
             'message' => 'required|string',
             'jenjang' => 'nullable|string',
+            'fakultas' => 'nullable|string',
+            'jurusan' => 'nullable|string',
         ]);
 
         $message = Message::create([
@@ -22,6 +24,8 @@ class MessageController extends Controller
             'contact_info' => $validated['contact_info'],
             'message' => $validated['message'],
             'jenjang' => $validated['jenjang'] ?? 'UMUM',
+            'fakultas' => $validated['fakultas'] ?? null,
+            'jurusan' => $validated['jurusan'] ?? null,
             'type' => 'contact',
         ]);
 
@@ -39,6 +43,8 @@ class MessageController extends Controller
             'category' => 'required|string|max:255',
             'message' => 'required|string',
             'jenjang' => 'nullable|string',
+            'fakultas' => 'nullable|string',
+            'jurusan' => 'nullable|string',
         ]);
 
         $message = Message::create([
@@ -47,6 +53,8 @@ class MessageController extends Controller
             'category' => $validated['category'],
             'message' => $validated['message'],
             'jenjang' => $validated['jenjang'] ?? 'UMUM',
+            'fakultas' => $validated['fakultas'] ?? null,
+            'jurusan' => $validated['jurusan'] ?? null,
             'type' => 'complaint',
         ]);
 

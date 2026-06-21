@@ -11,7 +11,16 @@ class JournalController extends Controller
 {
     public function index()
     {
-        $journals = Journal::orderBy('created_at', 'desc')->get();
+        $query = Journal::orderBy('created_at', 'desc');
+
+        if (request()->has('fakultas') && request()->fakultas) {
+            $query->where('fakultas', request()->fakultas);
+        }
+        if (request()->has('jurusan') && request()->jurusan) {
+            $query->where('jurusan', request()->jurusan);
+        }
+
+        $journals = $query->get();
         return response()->json(['data' => $journals]);
     }
 
@@ -28,15 +37,31 @@ class JournalController extends Controller
 
     public function limit($count)
     {
-        $journals = Journal::orderBy('created_at', 'desc')
-                ->limit($count)
-                ->get();
+        $query = Journal::orderBy('created_at', 'desc');
+
+        if (request()->has('fakultas') && request()->fakultas) {
+            $query->where('fakultas', request()->fakultas);
+        }
+        if (request()->has('jurusan') && request()->jurusan) {
+            $query->where('jurusan', request()->jurusan);
+        }
+
+        $journals = $query->limit($count)->get();
         return response()->json(['data' => $journals]);
     }
 
     public function best()
     {
-        $bestJournals = Journal::where('is_best', true)->latest()->get();
+        $query = Journal::where('is_best', true)->latest();
+
+        if (request()->has('fakultas') && request()->fakultas) {
+            $query->where('fakultas', request()->fakultas);
+        }
+        if (request()->has('jurusan') && request()->jurusan) {
+            $query->where('jurusan', request()->jurusan);
+        }
+
+        $bestJournals = $query->get();
         return response()->json(['data' => $bestJournals]);
     }
 
@@ -52,6 +77,8 @@ class JournalController extends Controller
             'date' => 'required|date',
             'is_best' => 'nullable|boolean',
             'jenjang' => 'required|string',
+            'fakultas' => 'nullable|string',
+            'jurusan' => 'nullable|string',
             'documentUrl' => 'nullable|file|mimes:pdf|max:10240', // Max 10MB
         ]);
 
@@ -76,6 +103,8 @@ class JournalController extends Controller
             'date' => $request->date,
             'is_best' => $request->input('is_best', false),
             'jenjang' => $request->jenjang,
+            'fakultas' => $request->input('fakultas'),
+            'jurusan' => $request->input('jurusan'),
             'documentUrl' => $documentUrl,
         ]);
 
@@ -103,6 +132,8 @@ class JournalController extends Controller
             'date' => 'nullable|date',
             'is_best' => 'nullable|boolean',
             'jenjang' => 'nullable|string',
+            'fakultas' => 'nullable|string',
+            'jurusan' => 'nullable|string',
             'documentUrl' => 'nullable|file|mimes:pdf|max:10240',
         ]);
 
@@ -130,6 +161,8 @@ class JournalController extends Controller
         if ($request->filled('date')) $journal->date = $request->date; // Fix: Only update date if filled
         if ($request->has('is_best')) $journal->is_best = $request->input('is_best');
         if ($request->has('jenjang')) $journal->jenjang = $request->jenjang;
+        if ($request->has('fakultas')) $journal->fakultas = $request->input('fakultas');
+        if ($request->has('jurusan')) $journal->jurusan = $request->input('jurusan');
 
         $journal->save();
 

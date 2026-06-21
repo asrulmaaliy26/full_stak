@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Messages\Schemas;
 
 use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Utilities\Get;
 
 class MessageForm
 {
@@ -31,7 +32,33 @@ class MessageForm
                 \Filament\Forms\Components\Select::make('jenjang')
                     ->label('Jenjang')
                     ->options(\App\Support\Jenjang::options())
+                    ->live()
                     ->native(false),
+                \Filament\Forms\Components\Select::make('fakultas')
+                    ->label('Fakultas')
+                    ->options([
+                        'Ushuluddin' => 'Ushuluddin',
+                        'Tarbiyah' => 'Tarbiyah',
+                    ])
+                    ->visible(fn (Get $get) => $get('jenjang') === 'KAMPUS')
+                    ->live()
+                    ->native(false)
+                    ->nullable(),
+                \Filament\Forms\Components\Select::make('jurusan')
+                    ->label('Jurusan')
+                    ->options(fn (Get $get) => match ($get('fakultas')) {
+                        'Ushuluddin' => [
+                            'Studi Islam' => 'Studi Islam',
+                            'Ilmu Al-Quran dan Tafsir' => 'Ilmu Al-Quran dan Tafsir',
+                        ],
+                        'Tarbiyah' => [
+                            'Manajemen Pendidikan Islam' => 'Manajemen Pendidikan Islam',
+                        ],
+                        default => [],
+                    })
+                    ->visible(fn (Get $get) => $get('jenjang') === 'KAMPUS' && filled($get('fakultas')))
+                    ->native(false)
+                    ->nullable(),
 
                 \Filament\Forms\Components\Textarea::make('message')
                     ->label('Isi Pesan')

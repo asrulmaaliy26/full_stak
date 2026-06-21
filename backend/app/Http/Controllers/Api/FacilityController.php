@@ -10,7 +10,16 @@ class FacilityController extends Controller
 {
     public function index()
     {
-        return response()->json(['data' => Facility::all()]);
+        $query = Facility::query();
+
+        if (request()->has('fakultas') && request()->fakultas) {
+            $query->where('fakultas', request()->fakultas);
+        }
+        if (request()->has('jurusan') && request()->jurusan) {
+            $query->where('jurusan', request()->jurusan);
+        }
+
+        return response()->json(['data' => $query->get()]);
     }
 
     public function show($id)
@@ -26,7 +35,16 @@ class FacilityController extends Controller
 
     public function limit($count)
     {
-        $limitedFacilities = Facility::limit($count)->get();
+        $query = Facility::query();
+
+        if (request()->has('fakultas') && request()->fakultas) {
+            $query->where('fakultas', request()->fakultas);
+        }
+        if (request()->has('jurusan') && request()->jurusan) {
+            $query->where('jurusan', request()->jurusan);
+        }
+
+        $limitedFacilities = $query->limit($count)->get();
         return response()->json(['data' => $limitedFacilities]);
     }
 }

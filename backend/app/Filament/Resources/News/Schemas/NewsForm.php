@@ -59,8 +59,36 @@ class NewsForm
                         ->label('Jenjang Pendidikan')
                         ->options(\App\Support\Jenjang::options())
                         ->required()
+                        ->live()
                         ->native(false)
                         ->dehydrateStateUsing(fn ($state) => strtoupper($state)),
+
+                    Select::make('fakultas')
+                        ->label('Fakultas')
+                        ->options([
+                            'Ushuluddin' => 'Ushuluddin',
+                            'Tarbiyah' => 'Tarbiyah',
+                        ])
+                        ->visible(fn (Get $get) => $get('jenjang') === 'KAMPUS')
+                        ->live()
+                        ->native(false)
+                        ->nullable(),
+
+                    Select::make('jurusan')
+                        ->label('Jurusan')
+                        ->options(fn (Get $get) => match ($get('fakultas')) {
+                            'Ushuluddin' => [
+                                'Studi Islam' => 'Studi Islam',
+                                'Ilmu Al-Quran dan Tafsir' => 'Ilmu Al-Quran dan Tafsir',
+                            ],
+                            'Tarbiyah' => [
+                                'Manajemen Pendidikan Islam' => 'Manajemen Pendidikan Islam',
+                            ],
+                            default => [],
+                        })
+                        ->visible(fn (Get $get) => $get('jenjang') === 'KAMPUS' && filled($get('fakultas')))
+                        ->native(false)
+                        ->nullable(),
 
                     // Tingkat Prestasi (Kondisional: Hanya jika kategori == Prestasi)
                     Select::make('level')

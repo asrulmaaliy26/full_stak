@@ -11,7 +11,16 @@ class ProjectController extends Controller
 {
     public function index()
     {
-        $projects = Project::orderBy('created_at', 'desc')->get();
+        $query = Project::orderBy('created_at', 'desc');
+
+        if (request()->has('fakultas') && request()->fakultas) {
+            $query->where('fakultas', request()->fakultas);
+        }
+        if (request()->has('jurusan') && request()->jurusan) {
+            $query->where('jurusan', request()->jurusan);
+        }
+
+        $projects = $query->get();
         return response()->json(['data' => $projects]);
     }
 
@@ -28,9 +37,16 @@ class ProjectController extends Controller
 
     public function limit($count)
     {
-        $projects = Project::orderBy('created_at', 'desc')
-                ->limit($count)
-                ->get();
+        $query = Project::orderBy('created_at', 'desc');
+
+        if (request()->has('fakultas') && request()->fakultas) {
+            $query->where('fakultas', request()->fakultas);
+        }
+        if (request()->has('jurusan') && request()->jurusan) {
+            $query->where('jurusan', request()->jurusan);
+        }
+
+        $projects = $query->limit($count)->get();
         return response()->json(['data' => $projects]);
     }
 
@@ -43,6 +59,8 @@ class ProjectController extends Controller
             'author' => 'required|string',
             'date' => 'required|date',
             'jenjang' => 'required|string',
+            'fakultas' => 'nullable|string',
+            'jurusan' => 'nullable|string',
             'imageUrl' => 'required|image|max:2048',
             'documents.*' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:5120',
             'document_types.*' => 'nullable|string',
@@ -89,6 +107,8 @@ class ProjectController extends Controller
             'author' => $request->author,
             'date' => $request->date,
             'jenjang' => $request->jenjang,
+            'fakultas' => $request->input('fakultas'),
+            'jurusan' => $request->input('jurusan'),
             'imageUrl' => url('storage/' . $imagePath),
             'documents' => $documentsData,
         ]);
@@ -114,6 +134,8 @@ class ProjectController extends Controller
             'author' => 'nullable|string',
             'date' => 'nullable|date',
             'jenjang' => 'nullable|string',
+            'fakultas' => 'nullable|string',
+            'jurusan' => 'nullable|string',
             'imageUrl' => 'nullable|image|max:2048',
             'documents.*' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:5120',
             'document_types.*' => 'nullable|string',
@@ -164,6 +186,8 @@ class ProjectController extends Controller
         if ($request->has('author')) $project->author = $request->author;
         if ($request->filled('date')) $project->date = $request->date;
         if ($request->has('jenjang')) $project->jenjang = $request->jenjang;
+        if ($request->has('fakultas')) $project->fakultas = $request->input('fakultas');
+        if ($request->has('jurusan')) $project->jurusan = $request->input('jurusan');
 
         $project->save();
 

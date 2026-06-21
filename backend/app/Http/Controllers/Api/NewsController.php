@@ -11,7 +11,16 @@ class NewsController extends Controller
 {
     public function index()
     {
-        $news = News::orderBy('created_at', 'desc')->get();
+        $query = News::orderBy('created_at', 'desc');
+
+        if (request()->has('fakultas') && request()->fakultas) {
+            $query->where('fakultas', request()->fakultas);
+        }
+        if (request()->has('jurusan') && request()->jurusan) {
+            $query->where('jurusan', request()->jurusan);
+        }
+
+        $news = $query->get();
         return response()->json(['data' => $news]);
     }
 
@@ -33,6 +42,13 @@ class NewsController extends Controller
         // Jika ada parameter jenjang, filter dulu
         if ($jenjang) {
             $query->where('jenjang', $jenjang);
+        }
+
+        if (request()->has('fakultas') && request()->fakultas) {
+            $query->where('fakultas', request()->fakultas);
+        }
+        if (request()->has('jurusan') && request()->jurusan) {
+            $query->where('jurusan', request()->jurusan);
         }
 
         $news = $query->limit($count)->get();
@@ -58,6 +74,8 @@ class NewsController extends Controller
             'category' => 'required|string',
             'level' => 'nullable|string',
             'jenjang' => 'required|string',
+            'fakultas' => 'nullable|string',
+            'jurusan' => 'nullable|string',
             'main_image' => 'required|image|max:2048',
             'gallery.*' => 'nullable|image|max:2048',
         ]);
@@ -91,6 +109,8 @@ class NewsController extends Controller
             'category' => $request->category,
             'level' => $request->input('level'),
             'jenjang' => $request->jenjang,
+            'fakultas' => $request->input('fakultas'),
+            'jurusan' => $request->input('jurusan'),
             'main_image' => url('storage/' . $mainImagePath),
             'gallery' => collect($galleryPaths)->map(fn ($p) => url('storage/' . $p))->toArray(),
         ]);
@@ -117,6 +137,8 @@ class NewsController extends Controller
             'category' => 'nullable|string',
             'level' => 'nullable|string',
             'jenjang' => 'nullable|string',
+            'fakultas' => 'nullable|string',
+            'jurusan' => 'nullable|string',
             'main_image' => 'nullable|image|max:2048',
             'gallery.*' => 'nullable|image|max:2048',
         ]);
@@ -156,6 +178,8 @@ class NewsController extends Controller
         if ($request->has('category')) $news->category = $request->category;
         if ($request->has('level')) $news->level = $request->input('level');
         if ($request->has('jenjang')) $news->jenjang = $request->jenjang;
+        if ($request->has('fakultas')) $news->fakultas = $request->input('fakultas');
+        if ($request->has('jurusan')) $news->jurusan = $request->input('jurusan');
 
         $news->save();
 
