@@ -24,7 +24,7 @@ const Journals: React.FC = () => {
   const [loading, setLoading] = useState(!homeCache.isJournalsLoaded);
 
   const [limit, setLimit] = useState(homeCache.allJournals?.length || 6);
-  const [hasMore, setHasMore] = useState(true);
+  const [hasMore, setHasMore] = useState(homeCache.hasMoreJournals);
 
   useEffect(() => {
     if (homeCache.journalCategories && homeCache.journalCategories.length > 0) return;
@@ -44,7 +44,7 @@ const Journals: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (homeCache.isJournalsLoaded && journals.length >= limit) {
+    if (homeCache.isJournalsLoaded && (!homeCache.hasMoreJournals || journals.length >= limit)) {
       setLoading(false);
       return;
     }
@@ -54,13 +54,10 @@ const Journals: React.FC = () => {
       try {
         const journalsData = await fetchJournalsWithLimit(limit);
         setJournals(journalsData);
-        setHomeCache({ allJournals: journalsData, isJournalsLoaded: true });
 
-        if (journalsData.length < limit) {
-          setHasMore(false);
-        } else {
-          setHasMore(true);
-        }
+        const hasMoreData = journalsData.length >= limit;
+        setHasMore(hasMoreData);
+        setHomeCache({ allJournals: journalsData, isJournalsLoaded: true, hasMoreJournals: hasMoreData });
       } catch (error) {
         console.error('Error loading data:', error);
       } finally {

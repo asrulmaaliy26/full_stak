@@ -45,20 +45,14 @@ const Navbar: React.FC = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
-  const handleLevelClick = (level: string) => {
-    const externalLinks: Record<string, string> = {
-      'MI': 'https://mi.lpialhidayah.or.id',
-      'SMPT': 'https://smpt.lpialhidayah.or.id',
-      'MA': 'https://ma.lpialhidayah.or.id',
-    };
-
-    if (externalLinks[level]) {
-      window.location.href = externalLinks[level];
-    } else {
-      setActiveLevel(level);
-      setIsLevelSelectorOpen(false);
-      setIsOpen(false);
-    }
+  const externalLinks: Record<string, string> = {
+    'UMUM': 'https://lpialhidayah.or.id',
+    'MI': 'https://mi.lpialhidayah.or.id',
+    'SMPT': 'https://smpt.lpialhidayah.or.id',
+    'MA': 'https://ma.lpialhidayah.or.id',
+    'KAMPUS': 'https://kampus.lpialhidayah.or.id',
+    'TPQ': 'https://tpq.lpialhidayah.or.id',
+    'MADIN': 'https://madin.lpialhidayah.or.id',
   };
 
   return (
@@ -82,16 +76,16 @@ const Navbar: React.FC = () => {
                 <ChevronDown className="w-3 h-3" />
               </button>
               {isLevelSelectorOpen && (
-                <div className="absolute top-full left-0 pt-2 w-48 z-[60]">
+                <div className="absolute top-full left-0 pt-2 w-56 z-[999]">
                   <div className="bg-white border border-slate-100 shadow-2xl rounded-2xl overflow-hidden py-2 animate-fadeIn">
                     {levels.map(l => (
-                      <button
+                      <a
                         key={l}
-                        onClick={() => handleLevelClick(l)}
-                        className={`w-full text-left px-5 py-3 text-xs font-black hover:bg-slate-50 transition-colors ${activeLevel === l ? 'text-islamic-gold-500' : 'text-slate-600'}`}
+                        href={externalLinks[l] || '#'}
+                        className={`block w-full text-left px-6 py-3 text-sm font-black hover:bg-slate-50 transition-colors ${activeLevel === l ? 'text-islamic-gold-500' : 'text-slate-600'}`}
                       >
                         {l === 'UMUM' ? 'Pusat (Umum)' : l}
-                      </button>
+                      </a>
                     ))}
                   </div>
                 </div>
@@ -182,15 +176,15 @@ const Navbar: React.FC = () => {
       {/* Mobile Menu */}
       {isOpen && (
         <div className="lg:hidden bg-white border-t border-slate-100 py-6 px-4 space-y-4 animate-fadeIn">
-          <div className="grid grid-cols-5 gap-2 px-2">
+          <div className="grid grid-cols-4 gap-2 px-2">
             {levels.map(l => (
-              <button
+              <a
                 key={l}
-                onClick={() => handleLevelClick(l)}
-                className={`py-2 rounded-lg text-[10px] font-black border transition-all ${activeLevel === l ? 'bg-slate-900 text-white' : 'bg-slate-50 text-slate-400 border-slate-100'}`}
+                href={externalLinks[l] || '#'}
+                className={`block text-center py-2.5 rounded-lg text-xs font-black border transition-all ${activeLevel === l ? 'bg-slate-900 text-white' : 'bg-slate-50 text-slate-400 border-slate-100 hover:bg-slate-100'}`}
               >
                 {l}
-              </button>
+              </a>
             ))}
           </div>
           {navLinks.map((link) => (

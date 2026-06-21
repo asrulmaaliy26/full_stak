@@ -25,9 +25,13 @@ class MessageForm
                     ->label('Kategori')
                     ->maxLength(255),
 
-                \Filament\Forms\Components\TextInput::make('type')
+                \Filament\Forms\Components\Select::make('type')
                     ->label('Tipe Pesan')
-                    ->maxLength(255),
+                    ->options([
+                        'contact' => 'Kontak',
+                        'complaint' => 'Pengaduan',
+                    ])
+                    ->required(),
 
                 \Filament\Forms\Components\Select::make('jenjang')
                     ->label('Jenjang')

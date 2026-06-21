@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import Carousel from '../components/Carousel';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -134,6 +134,9 @@ const Home: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    // Check if we have cached news, but because activeLevel can change, 
+    // we only use cache if it exists, otherwise we'll fetch.
+    // For a robust level switcher, we re-fetch on level change.
     let isMounted = true;
     const loadNewsData = async () => {
       setLoadingNews(true);
@@ -146,6 +149,7 @@ const Home: React.FC = () => {
         }
         if (isMounted) {
           setNews(newsData);
+          setHomeCache({ news: newsData });
         }
       } catch (error) {
         console.error('Error loading news data:', error);
@@ -158,7 +162,8 @@ const Home: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, [activeLevel]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeLevel, setHomeCache]);
 
   // Filtering data berdasarkan level
   // News fetching is now handled per level, so we rely on API response directly.
@@ -251,12 +256,15 @@ const Home: React.FC = () => {
 
           <div className="md:w-1/2 relative w-full">
             <div className="relative z-10 rounded-[2.5rem] md:rounded-[3.5rem] overflow-hidden shadow-2xl border-4 md:border-8 border-white aspect-[4/3] md:aspect-auto md:h-[500px]">
-              <img
-                src={profile ? profile.imageUrl : "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9"}
-                alt="Pendidikan"
-                className="w-full h-full object-cover"
-              />
-            </div>
+                {loading ? (
+                <div className="w-full h-full bg-slate-200 animate-pulse"></div>
+              ) : (
+                <img
+                  src={profile?.imageUrl || import.meta.env.VITE_ABOUT_IMAGE}
+                  alt="Profile"
+                  className="relative rounded-[2.5rem] shadow-2xl object-cover h-[400px] w-full border-4 border-white"
+                />
+              )}</div>
           </div>
         </div>
       </section>

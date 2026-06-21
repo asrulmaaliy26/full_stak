@@ -25,7 +25,7 @@ const News: React.FC = () => {
   const [newsLoading, setNewsLoading] = useState(!homeCache.isNewsLoaded);
 
   const [limit, setLimit] = useState(homeCache.allNews?.length || 6);
-  const [hasMore, setHasMore] = useState(true);
+  const [hasMore, setHasMore] = useState(homeCache.hasMoreNews);
 
   const { activeLevel } = useContext(LevelContext);
   const LEVEL_CONFIG = useLevelConfig();
@@ -50,8 +50,8 @@ const News: React.FC = () => {
 
   // News Data Load (with limit)
   useEffect(() => {
-    // If loaded from cache and we have enough data for current limit, skip fetch
-    if (homeCache.isNewsLoaded && news.length >= limit) {
+    // If loaded from cache and we have enough data for current limit OR we've exhausted all data, skip fetch
+    if (homeCache.isNewsLoaded && (!homeCache.hasMoreNews || news.length >= limit)) {
       setNewsLoading(false);
       return;
     }
@@ -61,14 +61,11 @@ const News: React.FC = () => {
       try {
         const newsData = await fetchNewsWithLimit(limit);
         setNews(newsData);
-        setHomeCache({ allNews: newsData, isNewsLoaded: true });
 
         // If we received fewer items than requested limit, we've reached the end
-        if (newsData.length < limit) {
-          setHasMore(false);
-        } else {
-          setHasMore(true);
-        }
+        const hasMoreData = newsData.length >= limit;
+        setHasMore(hasMoreData);
+        setHomeCache({ allNews: newsData, isNewsLoaded: true, hasMoreNews: hasMoreData });
       } catch (error) {
         console.error('Error loading news:', error);
       } finally {
@@ -82,7 +79,7 @@ const News: React.FC = () => {
     return news.filter(n => {
       const matchesSearch = n.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         n.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesLevel = activeLevel === 'UMUM' ? true : n.jenjang === activeLevel;
+      const matchesLevel = activeLevel === 'UMUM' ? true : (n.jenjang === activeLevel || n.jenjang === 'UMUM');
       const matchesCategory = activeCategory === 'Semua' ? true : n.category === activeCategory;
 
       return matchesSearch && matchesLevel && matchesCategory;
@@ -95,7 +92,7 @@ const News: React.FC = () => {
 
   const trendingNews = useMemo(() => {
     return [...news]
-      .filter(n => activeLevel === 'UMUM' ? true : n.jenjang === activeLevel)
+      .filter(n => activeLevel === 'UMUM' ? true : (n.jenjang === activeLevel || n.jenjang === 'UMUM'))
       .sort((a, b) => b.views - a.views)
       .slice(0, 4);
   }, [news, activeLevel]);

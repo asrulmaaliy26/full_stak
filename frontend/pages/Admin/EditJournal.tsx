@@ -205,7 +205,7 @@ const EditJournal: React.FC = () => {
 
               <div>
                 <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 mb-4">
-                  <User className="w-4 h-4" /> Penulis / Mahasiswa
+                  <User className="w-4 h-4" /> Penulis / Santri
                 </label>
                 <input
                   type="text"

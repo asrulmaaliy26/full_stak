@@ -18,14 +18,28 @@ class MessageReplyMail extends Mailable
      */
     public $replySubject;
     public $replyContent;
+    public $schoolName;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($subject, $content)
+    public function __construct($subject, $content, $jenjang = 'UMUM')
     {
         $this->replySubject = $subject;
         $this->replyContent = $content;
+        
+        $names = [
+            'TK' => 'TK Al Hidayah',
+            'MI' => 'MI Al Hidayah',
+            'SMPT' => 'SMPT Al Hidayah',
+            'MA' => 'MA Al Hidayah',
+            'MADIN' => 'MADIN Al Hidayah',
+            'TPQ' => 'TPQ Al Hidayah',
+            'KAMPUS' => 'STAI Al Mannan',
+            'UMUM' => 'LPI Al Hidayah'
+        ];
+        
+        $this->schoolName = $names[strtoupper($jenjang)] ?? 'LPI Al Hidayah';
     }
 
     /**

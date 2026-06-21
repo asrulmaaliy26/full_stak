@@ -67,7 +67,7 @@ class MessagesTable
                         try {
                             // Send Email
                             \Illuminate\Support\Facades\Mail::to($record->contact_info)
-                                ->send(new \App\Mail\MessageReplyMail($data['subject'], $data['content']));
+                                ->send(new \App\Mail\MessageReplyMail($data['subject'], $data['content'], $record->jenjang));
 
                             // Update Record
                             $record->update([
@@ -91,6 +91,19 @@ class MessagesTable
                         }
                     })
                     ->visible(fn ($record) => filter_var($record->contact_info, FILTER_VALIDATE_EMAIL)),
+                \Filament\Actions\Action::make('reply_wa')
+                    ->label('Hubungi ke WA')
+                    ->icon('heroicon-o-chat-bubble-left-ellipsis')
+                    ->color('success')
+                    ->url(function ($record) {
+                        $phone = preg_replace('/[^0-9]/', '', $record->contact_info);
+                        if (str_starts_with($phone, '0')) {
+                            $phone = '62' . substr($phone, 1);
+                        }
+                        return 'https://wa.me/' . $phone;
+                    })
+                    ->openUrlInNewTab()
+                    ->visible(fn ($record) => !filter_var($record->contact_info, FILTER_VALIDATE_EMAIL)),
             ])
             ->recordAction(\Filament\Actions\ViewAction::class)
             ->toolbarActions([

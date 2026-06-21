@@ -4,7 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TPQ Al Hidayah - Islami & Qurani</title>
+  <title>Lembaga Pendidikan Islam Al Hidayah - Islami & Qurani</title>
+  <link rel="icon" type="image/png" href="/logolpi.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <link
     href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Amiri:wght@400;700&display=swap"
@@ -84,7 +85,7 @@
   }
 }
 </script>
-  <script type="module" crossorigin src="/assets/index-C2D5g8P6.js"></script>
+  <script type="module" crossorigin src="/assets/index-CUlbhUFp.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/index-Cv10lgu1.css">
 </head>
 
