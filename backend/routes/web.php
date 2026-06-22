@@ -22,6 +22,7 @@ Route::get('/home', [HomeController::class, 'index']);
 
 Route::get('/news', [NewsController::class, 'index']);
 Route::get('/news/limit/{count}/{jenjang?}', [NewsController::class, 'limit']);
+Route::get('/news/category/{category}', [NewsController::class, 'getByCategory']);
 Route::get('/news/{id}', [NewsController::class, 'show']);
 
 
