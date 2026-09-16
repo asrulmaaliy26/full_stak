@@ -10,8 +10,35 @@ class HomeController extends Controller
     //
     public function index()
     {
+        $fakultas = request()->get('fakultas');
+        $jurusan = request()->get('jurusan');
+
+        $newsQuery = \App\Models\News::orderBy('created_at', 'desc');
+        $projectsQuery = \App\Models\Project::orderBy('created_at', 'desc');
+        $journalsQuery = \App\Models\Journal::orderBy('created_at', 'desc');
+        $facilitiesQuery = \App\Models\Facility::query();
+
+        if ($fakultas) {
+            $newsQuery->where('fakultas', $fakultas);
+            $projectsQuery->where('fakultas', $fakultas);
+            $journalsQuery->where('fakultas', $fakultas);
+            $facilitiesQuery->where('fakultas', $fakultas);
+        }
+        if ($jurusan) {
+            $newsQuery->where('jurusan', $jurusan);
+            $projectsQuery->where('jurusan', $jurusan);
+            $journalsQuery->where('jurusan', $jurusan);
+            $facilitiesQuery->where('jurusan', $jurusan);
+        }
+
         return response()->json([
             'stats' => [
+                'IAT' => [
+                    ['label' => 'Mahasiswa Aktif', 'value' => '350+'],
+                    ['label' => 'Dosen Ahli & Mufassir', 'value' => '24'],
+                    ['label' => 'Hafizh/Hafizhah 30 Juz', 'value' => '85%'],
+                    ['label' => 'Alumni Berdaya Saing', 'value' => '1.200+'],
+                ],
                 'KAMPUS' => [
                     ['label' => 'Total Mahasiswa', 'value' => 2400],
                     ['label' => 'Dosen', 'value' => 150],
@@ -55,25 +82,25 @@ class HomeController extends Controller
 
             'slides' => [
                 [
-                    'image' => 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d',
-                    'title' => 'Membangun Generasi Qurani',
-                    'subtitle' => 'Integrasi ilmu modern dengan Al-Quran.'
+                    'image' => '/gedungdepan.jpg',
+                    'title' => 'Program Studi Ilmu Al-Qur\'an & Tafsir',
+                    'subtitle' => 'Mencetak Mufassir Muda Berakhlak Qurani, Kritis, dan Berwawasan Global.'
                 ],
                 [
-                    'image' => 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9',
-                    'title' => 'Pendidikan Berkualitas',
-                    'subtitle' => 'Berdedikasi tinggi untuk masa depan gemilang.'
+                    'image' => '/slide2.jpg',
+                    'title' => 'Integrasi Turats & Sains Modern',
+                    'subtitle' => 'Kajian Tafsir Klasik, Living Qur\'an, hingga Digital Quranic Studies.'
                 ],
                 [
-                    'image' => 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9',
-                    'title' => 'Inovasi Tanpa Batas',
-                    'subtitle' => 'Riset dan teknologi dalam bingkai keislaman.'
+                    'image' => '/slide1.jpg',
+                    'title' => 'Program Unggulan Tahfidz & Sanad Qira\'at',
+                    'subtitle' => 'Bimbingan Intensif Bersanad dengan Para Masyayikh & Ulama Al-Qur\'an.'
                 ],
             ],
-            'news' => \App\Models\News::limit(3)->get(),
-            'projects' => \App\Models\Project::limit(3)->get(),
-            'journals' => \App\Models\Journal::limit(3)->get(),
-            'facilities' => \App\Models\Facility::limit(3)->get(),
+            'news' => $newsQuery->limit(3)->get(),
+            'projects' => $projectsQuery->limit(3)->get(),
+            'journals' => $journalsQuery->limit(3)->get(),
+            'facilities' => $facilitiesQuery->limit(3)->get(),
         ]);
     }
 }

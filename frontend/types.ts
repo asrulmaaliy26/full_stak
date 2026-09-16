@@ -14,6 +14,8 @@ export interface NewsItem {
   jenjang: EducationLevel;
   level?: string;
   gallery: string[];
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface ProjectDocument {

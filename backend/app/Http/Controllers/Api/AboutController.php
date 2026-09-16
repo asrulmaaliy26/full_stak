@@ -109,6 +109,26 @@ class AboutController extends Controller
                     'nama' => "Anma Muniri S. Hum.",
                     'staff' => []
                 ]
+            ],
+            'IAT' => [
+                'history' => "Program Studi Ilmu Al-Qur'an dan Tafsir (IAT) didirikan di bawah naungan Fakultas Ushuluddin STAI Al-Mannan untuk menjawab kebutuhan umat akan lahirnya generasi yang memahami Al-Qur'an secara mendalam, moderat, dan berintelektual tinggi. Dengan perpaduan tradisi pesantren dan tradisi akademik universitas riset, IAT STAI Al-Mannan terus melahirkan lulusan bergelar S.Ag yang berkiprah luas di berbagai lini kehidupan umat dan bangsa.",
+                'visi' => "Menjadi Program Studi Ilmu Al-Qur'an dan Tafsir yang Unggul, Berakar pada Turats Islamiyah, dan Berdaya Saing Global dalam Pengembangan Keilmuan Al-Qur'an serta Pemberdayaan Masyarakat pada Tahun 2030.",
+                'misi' => [
+                    "Menyelenggarakan pendidikan dan pengajaran Ilmu Al-Qur'an dan Tafsir berkualitas tinggi berbasis integrasi turats dan metodologi modern.",
+                    "Mengembangkan riset inovatif dalam bidang studi naskah tafsir nusantara, living Qur'an, dan digital quranic studies.",
+                    "Melaksanakan pengabdian kepada masyarakat melalui pembinaan tahfidz, dakwah Al-Qur'an, dan literasi keislaman.",
+                    "Menjalin kemitraan strategis dengan perguruan tinggi Islam, pusat riset Al-Qur'an nasional dan internasional."
+                ],
+                'struktur' => [
+                    'pimpinan' => "Ketua Program Studi (Kaprodi)",
+                    'nama' => "Dr. H. Muhammad Arifin, M.Ag., Al-Hafizh",
+                    'staff' => [
+                        ['role' => "Sekretaris Prodi", 'name' => "Ust. Ahmad Fauzan, M.Hum"],
+                        ['role' => "Ketua Lab Al-Qur'an", 'name' => "Ust. H. Ridwan Kamil, Lc., M.Ag"],
+                        ['role' => "Koordinator Tahfidz & Sanad", 'name' => "Usth. Hj. Nurul Hidayah, M.Pd., Al-Hafizhah"],
+                        ['role' => "Gugus Penjamin Mutu", 'name' => "Dr. Siti Fatimah, M.Ag"]
+                    ]
+                ]
             ]
         ];
     }
@@ -117,6 +137,11 @@ class AboutController extends Controller
     {
         $data = $this->getData();
         $key = strtoupper($jenjang);
+
+        // Jika request memiliki jurusan=IAT atau fakultas=Ushuluddin
+        if (request()->has('jurusan') && strtoupper(request()->jurusan) === 'IAT' && isset($data['IAT'])) {
+            $key = 'IAT';
+        }
 
         // Normalize SMA request to MA if needed
         if ($key === 'SMA' && !isset($data['SMA']) && isset($data['MA'])) {

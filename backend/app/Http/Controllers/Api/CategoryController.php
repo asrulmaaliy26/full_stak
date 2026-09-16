@@ -9,6 +9,38 @@ class CategoryController extends Controller
 {
     public function index()
     {
+        $jurusan = request()->get('jurusan');
+
+        if ($jurusan && strtoupper($jurusan) === 'IAT') {
+            return response()->json([
+                'project_categories' => [
+                    'Semua',
+                    'Pengabdian Masyarakat',
+                    'Riset Living Qur\'an',
+                    'Digital Quranic Studies',
+                    'Filologi & Manuskrip',
+                    'Desa Binaan Al-Qur\'an'
+                ],
+                'journal_categories' => [
+                    'Semua',
+                    'Studi Al-Qur\'an',
+                    'Metodologi Tafsir',
+                    'Qira\'at & Rasm',
+                    'Hermeneutika',
+                    'Tafsir Nusantara',
+                    'Skripsi Terbaik'
+                ],
+                'news_categories' => [
+                    'Semua',
+                    'Kajian Tafsir',
+                    'Seminar & Konferensi',
+                    'Tahfidz & Halaqah',
+                    'Akademik & Pengumuman',
+                    'Prestasi Mahasiswa'
+                ]
+            ]);
+        }
+
         return response()->json([
             'project_categories' => [
                 'Semua',
