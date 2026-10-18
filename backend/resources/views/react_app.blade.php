@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lembaga Pendidikan Islam Al Hidayah - Islami & Qurani</title>
+  <title>LPI Al Hidayah - Islami & Qurani</title>
   <link rel="icon" type="image/png" href="/logolpi.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <link
@@ -85,12 +85,76 @@
   }
 }
 </script>
-  <script type="module" crossorigin src="/assets/index-CUlbhUFp.js"></script>
+  <script type="module" crossorigin src="/assets/index-CD83tMZQ.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/index-Cv10lgu1.css">
 </head>
 
 <body class="bg-slate-50 text-slate-900">
-  <div id="root"></div>
+  <div id="root">
+    <!-- Initial Preloader shown before React loads -->
+    <style>
+      .initial-loader-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f8fafc;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+      }
+
+      .initial-spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid #dcfce7;
+        border-top: 4px solid #10b981;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .initial-text {
+        color: #065f46;
+        font-weight: bold;
+        font-size: 1.2rem;
+        letter-spacing: 1px;
+      }
+
+      .initial-subtext {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin-top: 8px;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+
+        0%,
+        100% {
+          opacity: 1;
+        }
+
+        50% {
+          opacity: 0.5;
+        }
+      }
+    </style>
+    <div class="initial-loader-container">
+      <div class="initial-spinner"></div>
+      <div class="initial-text">STAI Al Mannan</div>
+      <div class="initial-subtext">Memuat halaman, mohon tunggu...</div>
+    </div>
+  </div>
 </body>
 
 </html>

@@ -1,38 +1,243 @@
-
 import { GoogleGenAI } from "@google/genai";
 
-// Always initialize GoogleGenAI with the apiKey named parameter as per the guidelines
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
-export const getSchoolAssistantResponse = async (userPrompt: string) => {
-  if (!process.env.API_KEY) return "Maaf, asisten AI sedang tidak tersedia (API Key missing).";
-
-  const response = await ai.models.generateContent({
-    model: 'gemini-3-flash-preview',
-    contents: userPrompt,
-    config: {
-      systemInstruction: "Anda adalah asisten virtual LPI Al Hidayah yang bernuansa Islami dan Qurani. Jawablah pertanyaan seputar sekolah dengan sopan, ramah, dan informatif. Gunakan sapaan islami yang sesuai.",
-      temperature: 0.7,
-    },
-  });
-
-  // Access the text property directly on the GenerateContentResponse object
-  return response.text || "Maaf, saya tidak dapat memproses permintaan Anda saat ini.";
+const getApiKey = (): string => {
+  const key =
+    process.env.API_KEY ||
+    process.env.GEMINI_API_KEY ||
+    (import.meta as any).env?.VITE_GEMINI_API_KEY ||
+    (import.meta as any).env?.GEMINI_API_KEY ||
+    '';
+  return key;
 };
 
-export const generateNewsArticle = async (briefDescription: string) => {
-  if (!process.env.API_KEY) return "Gagal generate berita: API Key tidak ditemukan.";
+const getAiClient = () => {
+  const apiKey = getApiKey();
+  if (!apiKey || apiKey === 'PLACEHOLDER_API_KEY') {
+    return null;
+  }
+  return new GoogleGenAI({ apiKey });
+};
 
-  const response = await ai.models.generateContent({
-    model: 'gemini-3-pro-preview',
-    contents: `Buatkan artikel berita sekolah yang lengkap, inspiratif, dan formal berdasarkan deskripsi kegiatan berikut: "${briefDescription}". 
-    Artikel harus memiliki judul yang menarik, paragraf pembuka (lead), isi berita yang detail (minimal 3-4 paragraf), dan penutup yang memberikan kesan positif/quurani. 
-    Gunakan gaya bahasa jurnalistik namun tetap bernuansa sekolah islam unggul.`,
-    config: {
-      temperature: 0.8,
-    },
+const CANDIDATE_MODELS = ['gemini-3.8-flash', 'gemini-3-flash-preview', 'gemini-flash-latest'];
+
+export const YAYASAN_SYSTEM_INSTRUCTION = `
+Anda adalah Asisten Virtual Resmi Lembaga Pendidikan Islam (LPI) Al Hidayah & Yayasan Pendidikan Al Mannan Kauman Tulungagung.
+Tugas Anda adalah melayani pertanyaan pengunjung web, calon wali santri, calon siswa/mahasiswa, dan masyarakat umum secara ramah, sopan, solutif, serta bernuansa Islami dan Qurani.
+
+KNOWLEDGE BASE & INFORMASI LENGKAP LEMBAGA:
+
+1. PROFIL LEMBAGA:
+- Lembaga: Lembaga Pendidikan Islam (LPI) Al Hidayah / Yayasan Pendidikan Al Mannan.
+- Karakter: Pendidikan Islam Terpadu berkarakter Qurani, memadukan IPTEK sains modern dan ilmu agama/turats.
+
+2. UNIT-UNIT PENDIDIKAN DALAM YAYASAN:
+- TPQ Al Mannan: Pendidikan baca tulis Al-Qur'an, tahsin, dan fasholatan dasar.
+- MI Al Hidayah: Tingkat Ibtidaiyah (SD) berkarakter Qurani.
+- SMPT Al Mannan: SMP Terpadu berbasis kepesantrenan.
+- MA Al Hidayah: Madrasah Aliyah (setara SMA) unggul dalam tahfidz Al-Qur'an dan sains.
+- Madin Al Mannan: Madrasah Diniyah Takmiliyah pendalaman kitab turats dan akhlak.
+- STAI Al-Mannan: Perguruan Tinggi Islam dengan Program Studi S1 Ilmu Al-Qur'an dan Tafsir (IAT) bergelar S.Ag.
+
+3. PROGRAM UNGGULAN:
+- Program Tahfidz Al-Qur'an (target hingga 30 Juz bersanad).
+- Kurikulum Terpadu: Kurikulum Kemendikbudristek/Kemenag + Kepesantrenan Klasik.
+- Pembinaan Akhlak Rabbani & Kepemimpinan Umat.
+- Penguasaan Bahasa Asing (Arab dan Inggris) aktif.
+- Bimbingan Prestasi Sains, Olimpiade KSM, MTQ/Tahfidz, Kaligrafi, dan Karya Ilmiah.
+
+4. INFORMASI PPDB & PENDAFTARAN:
+- Terbuka untuk semua jenjang (TPQ, MI, SMPT, MA, hingga STAI Al-Mannan).
+- Tersedia Jalur Reguler, Jalur Prestasi, dan Jalur Beasiswa Tahfidz.
+- Konsultasi pendaftaran online & info syarat/biaya dapat langsung menghubungi kontak WhatsApp resmi atau website.
+
+5. KONTAK RESMI & ALAMAT:
+- Alamat Kampus Pusat: Jl. KH Hasyim Asyari No.27, Kauman, Kec. Kauman, Kabupaten Tulungagung, Jawa Timur 66261.
+- Kontak WhatsApp Admin & PPDB: 0815-5986-1036 (Ibu Mei)
+- Email: lpialhidayahkauman@gmail.com
+- Instagram: @lpialhidayahkauman
+- Website: https://lpialhidayah.or.id
+
+ATURAN MENJAWAB:
+- Selalu awali dengan sapaan Islami yang santun (Assalamu'alaikum Warahmatullahi Wabarakatuh).
+- Berikan jawaban yang terstruktur, akurat, dan mudah dipahami.
+- Sertakan nomor WhatsApp Ibu Mei (0815-5986-1036) dan lokasi Kauman Tulungagung jika ditanya mengenai pendaftaran atau kontak.
+`;
+
+export const getSchoolAssistantResponse = async (
+  userPrompt: string,
+  history: Array<{ role: 'user' | 'bot'; text: string }> = []
+): Promise<string> => {
+  const ai = getAiClient();
+  if (!ai) return "Maaf, asisten AI sedang tidak tersedia (API Key missing).";
+
+  const contents: any[] = [];
+  const recentHistory = history.slice(-6);
+  for (const msg of recentHistory) {
+    contents.push({
+      role: msg.role === 'user' ? 'user' : 'model',
+      parts: [{ text: msg.text }]
+    });
+  }
+  contents.push({
+    role: 'user',
+    parts: [{ text: userPrompt }]
   });
 
-  // Access the text property directly on the GenerateContentResponse object
-  return response.text || "Gagal generate konten berita.";
+  let lastError: any = null;
+  for (const model of CANDIDATE_MODELS) {
+    try {
+      const response = await ai.models.generateContent({
+        model: model,
+        contents: contents,
+        config: {
+          systemInstruction: YAYASAN_SYSTEM_INSTRUCTION,
+          temperature: 0.7,
+        },
+      });
+
+      if (response.text) {
+        return response.text;
+      }
+    } catch (error: any) {
+      lastError = error;
+      console.warn(`Model ${model} failed, trying fallback...`, error?.message);
+    }
+  }
+
+  console.error("All Gemini models failed:", lastError);
+  return "Maaf, terjadi gangguan saat menghubungi layanan AI: " + (lastError?.message || "Koneksi bermasalah");
+};
+
+export interface NewsPromptContext {
+  briefDescription?: string;
+  title?: string;
+  category?: string;
+  excerpt?: string;
+  jenjang?: string;
+  fakultas?: string;
+  jurusan?: string;
+  images?: (File | Blob | null | undefined)[];
+}
+
+// Convert File/Blob to Gemini inlineData base64 part
+export const fileToGenerativePart = async (file: File | Blob): Promise<{ inlineData: { data: string; mimeType: string } } | null> => {
+  return new Promise((resolve) => {
+    try {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const resultStr = reader.result as string;
+        if (resultStr && resultStr.includes(',')) {
+          const base64Data = resultStr.split(',')[1];
+          resolve({
+            inlineData: {
+              data: base64Data,
+              mimeType: file.type || 'image/jpeg'
+            }
+          });
+        } else {
+          resolve(null);
+        }
+      };
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(file);
+    } catch {
+      resolve(null);
+    }
+  });
+};
+
+export const generateNewsArticle = async (
+  contextOrDescription: string | NewsPromptContext
+): Promise<string> => {
+  const ai = getAiClient();
+  if (!ai) return "Gagal generate berita: API Key tidak ditemukan.";
+
+  const ctx: NewsPromptContext = typeof contextOrDescription === 'string'
+    ? { briefDescription: contextOrDescription }
+    : (contextOrDescription || {});
+
+  // 1. Convert all valid images to base64 inlineData
+  const imageParts: { inlineData: { data: string; mimeType: string } }[] = [];
+  if (ctx.images && Array.isArray(ctx.images)) {
+    for (const img of ctx.images) {
+      if (img && (img instanceof File || img instanceof Blob)) {
+        const part = await fileToGenerativePart(img);
+        if (part) {
+          imageParts.push(part);
+        }
+      }
+    }
+  }
+
+  // 2. Build structured base prompt from form metadata
+  const promptParts: string[] = [];
+  promptParts.push(`Anda adalah jurnalis dan humas profesional untuk Lembaga Pendidikan Islam (LPI) Al Hidayah & Al Mannan. Tugas Anda adalah menyusun artikel berita kegiatan yang lengkap, menarik, mendalam, dan bernuansa sekolah Islam unggul.`);
+
+  if (imageParts.length > 0) {
+    promptParts.push(`\n[ANALISIS FOTO DOKUMENTASI]:\nAda ${imageParts.length} foto kegiatan asli yang dilampirkan. Cermati detail visual di foto-foto tersebut (suasana kegiatan, orang/santri/tokoh/pembicara yang hadir, ekspresi wajah, spanduk/backdrop, plakat/trofi, dekorasi, dan aktivitas yang sedang berlangsung). Integrasikan detail nyata dari foto ini ke dalam narasi artikel berita agar terasa hidup, faktual, dan otentik.`);
+  }
+
+  const baseItems: string[] = [];
+  if (ctx.title && ctx.title.trim() && ctx.title !== 'Judul Baru') {
+    baseItems.push(`- Judul / Topik Berita: "${ctx.title.trim()}"`);
+  }
+  if (ctx.category && ctx.category.trim()) {
+    baseItems.push(`- Kategori Kegiatan: ${ctx.category.trim()}`);
+  }
+  if (ctx.jenjang && ctx.jenjang.trim()) {
+    baseItems.push(`- Jenjang: ${ctx.jenjang.trim()}`);
+  }
+  if (ctx.fakultas || ctx.jurusan) {
+    baseItems.push(`- Fakultas/Jurusan: ${(ctx.fakultas || '')} ${(ctx.jurusan || '')}`);
+  }
+  if (ctx.excerpt && ctx.excerpt.trim()) {
+    baseItems.push(`- Ringkasan / Poin Awal: "${ctx.excerpt.trim()}"`);
+  }
+
+  if (baseItems.length > 0) {
+    promptParts.push(`\n[DATA & KONTEKS DASAR (BASE PROMPT)]:\n${baseItems.join('\n')}`);
+  }
+
+  if (ctx.briefDescription && ctx.briefDescription.trim()) {
+    promptParts.push(`\n[POIN TAMBAHAN / INSTRUKSI KHUSUS DARI ADMIN]:\n"${ctx.briefDescription.trim()}"`);
+  } else if (baseItems.length === 0 && imageParts.length === 0) {
+    promptParts.push('\nBuatkan artikel berita kegiatan terkini yang menginspirasi.');
+  }
+
+  promptParts.push(`\n[KETENTUAN FORMAT OUTPUT]:
+1. Awali dengan judul berita yang menarik dan relevan di dalam tag <h3>Judul Berita</h3>.
+2. Tulis isi berita minimal 3-5 paragraf yang mengalir rapi dengan tag <p>.
+3. Gunakan tag <strong> untuk nama orang, prestasi, atau poin penting, serta <em> jika ada kutipan/sambutan.
+4. JANGAN sertakan tag <html>, <head>, atau <body>. Jangan gunakan wrapper markdown seperti \`\`\`html.
+5. Gunakan bahasa jurnalistik formal, santun, inspiratif, dan edukatif.`);
+
+  const promptText = promptParts.join('\n');
+  const contentsPayload: any[] = [...imageParts, { text: promptText }];
+
+  let lastError: any = null;
+  for (const model of CANDIDATE_MODELS) {
+    try {
+      const response = await ai.models.generateContent({
+        model: model,
+        contents: contentsPayload.length === 1 && typeof contentsPayload[0].text === 'string'
+          ? contentsPayload[0].text
+          : contentsPayload,
+        config: {
+          temperature: 0.7,
+        },
+      });
+
+      let text = response.text || "";
+      text = text.replace(/^\`\`\`html\s*/i, '').replace(/\`\`\`\s*$/i, '').trim();
+      if (text) {
+        return text;
+      }
+    } catch (error: any) {
+      lastError = error;
+      console.warn(`Model ${model} failed for multimodal news generation, trying fallback...`, error?.message);
+    }
+  }
+
+  console.error("Gemini News Generation Error:", lastError);
+  throw new Error(lastError?.message || "Gagal memproses AI");
 };

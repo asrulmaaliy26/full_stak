@@ -77,7 +77,7 @@ const App: React.FC = () => {
     setChatMessage('');
     setIsTyping(true);
     try {
-      const botResponse = await getSchoolAssistantResponse(userMsg);
+      const botResponse = await getSchoolAssistantResponse(userMsg, chatHistory);
       setChatHistory(prev => [...prev, { role: 'bot', text: botResponse }]);
     } catch (error) {
       setChatHistory(prev => [...prev, { role: 'bot', text: 'Maaf, sedang ada kendala teknis.' }]);
